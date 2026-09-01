@@ -1,4 +1,4 @@
--- SYPHIX HUB | Launcher v6 | MM2 Panel + Fixed Execute
+-- SYPHIX HUB | Launcher v8 | MM2 Panel 524x524 with Combat Submenus
 local P,R,U,T,C,L=game:GetService("Players"),game:GetService("RunService"),game:GetService("UserInputService"),game:GetService("TweenService"),workspace.CurrentCamera,game:GetService("Players").LocalPlayer
 local VU=game:GetService("VirtualUser")
 
@@ -31,17 +31,6 @@ TopBar.BorderSizePixel=0
 TopBar.Parent=G
 Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=TopBar
 
-local TopBarBorder=Instance.new("Frame")
-TopBarBorder.Size=UDim2.new(1,3,1,3)
-TopBarBorder.Position=UDim2.new(0,-1,0,-1)
-TopBarBorder.BackgroundColor3=Color3.fromRGB(255,200,50)
-TopBarBorder.BackgroundTransparency=0.7
-TopBarBorder.BorderSizePixel=0
-TopBarBorder.ZIndex=0
-TopBarBorder.Parent=TopBar
-Instance.new("UICorner").CornerRadius=UDim.new(0,13)Instance.new("UICorner").Parent=TopBarBorder
-TopBar.ZIndex=1
-
 local TopBarLogo=Instance.new("Frame")
 TopBarLogo.Size=UDim2.new(0,20,0,20)
 TopBarLogo.Position=UDim2.new(0,10,0,10)
@@ -71,7 +60,7 @@ TopBarArrow.TextSize=12
 TopBarArrow.Parent=TopBar
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=TopBarArrow
 
--- ============ МЕНЮ ЛАУНЧЕРА ============
+-- ============ ЛАУНЧЕР ============
 local M=Instance.new("Frame")
 M.Size=UDim2.new(0,0,0,0)
 M.Position=UDim2.new(.5,0,0,55)
@@ -83,44 +72,16 @@ M.Visible=false
 M.Parent=G
 Instance.new("UICorner").CornerRadius=UDim.new(0,16)Instance.new("UICorner").Parent=M
 
-local Border=Instance.new("Frame")
-Border.Size=UDim2.new(1,4,1,4)
-Border.Position=UDim2.new(0,-2,0,-2)
-Border.BackgroundColor3=Color3.fromRGB(255,200,50)
-Border.BackgroundTransparency=0.7
-Border.BorderSizePixel=0
-Border.ZIndex=0
-Border.Parent=M
-Instance.new("UICorner").CornerRadius=UDim.new(0,18)Instance.new("UICorner").Parent=Border
-M.ZIndex=1
-
 local Header=Instance.new("Frame")
 Header.Size=UDim2.new(1,0,0,60)
 Header.BackgroundColor3=Color3.fromRGB(18,18,35)
 Header.BorderSizePixel=0
 Header.Parent=M
 Instance.new("UICorner").CornerRadius=UDim.new(0,16)Instance.new("UICorner").Parent=Header
-local HeaderB=Instance.new("Frame")
-HeaderB.Size=UDim2.new(1,0,0,30)
-HeaderB.Position=UDim2.new(0,0,0,30)
-HeaderB.BackgroundColor3=Color3.fromRGB(18,18,35)
-HeaderB.BorderSizePixel=0
-HeaderB.Parent=Header
-
-local Logo=Instance.new("TextLabel")
-Logo.Size=UDim2.new(0,40,0,40)
-Logo.Position=UDim2.new(0,15,0,10)
-Logo.BackgroundColor3=Color3.fromRGB(255,200,50)
-Logo.Text="S"
-Logo.TextColor3=Color3.fromRGB(15,15,25)
-Logo.Font=Enum.Font.GothamBlack
-Logo.TextSize=24
-Logo.Parent=Header
-Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=Logo
 
 local Title=Instance.new("TextLabel")
 Title.Size=UDim2.new(0,200,0,25)
-Title.Position=UDim2.new(0,60,0,10)
+Title.Position=UDim2.new(0,15,0,10)
 Title.BackgroundTransparency=1
 Title.Text="SYPHIX HUB"
 Title.TextColor3=Color3.fromRGB(255,255,255)
@@ -129,176 +90,17 @@ Title.TextSize=16
 Title.TextXAlignment=Enum.TextXAlignment.Left
 Title.Parent=Header
 
-local Sub=Instance.new("TextLabel")
-Sub.Size=UDim2.new(0,200,0,18)
-Sub.Position=UDim2.new(0,60,0,35)
-Sub.BackgroundTransparency=1
-Sub.Text="SCRIPTS"
-Sub.TextColor3=Color3.fromRGB(150,150,180)
-Sub.Font=Enum.Font.Gotham
-Sub.TextSize=10
-Sub.TextXAlignment=Enum.TextXAlignment.Left
-Sub.Parent=Header
-
-local CloseBtn=Instance.new("TextButton")
-CloseBtn.Size=UDim2.new(0,26,0,26)
-CloseBtn.Position=UDim2.new(1,-32,0,17)
-CloseBtn.BackgroundColor3=Color3.fromRGB(255,60,60)
-CloseBtn.Text="X"
-CloseBtn.TextColor3=Color3.fromRGB(255,255,255)
-CloseBtn.Font=Enum.Font.GothamBold
-CloseBtn.TextSize=12
-CloseBtn.Parent=Header
-Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=CloseBtn
-
 local Content=Instance.new("ScrollingFrame")
 Content.Size=UDim2.new(1,-20,1,-75)
 Content.Position=UDim2.new(0,10,0,65)
 Content.BackgroundTransparency=1
 Content.BorderSizePixel=0
 Content.ScrollBarThickness=3
-Content.ScrollBarImageColor3=Color3.fromRGB(255,200,50)
 Content.Parent=M
 
--- ============ MM2 ПАНЕЛЬ ============
-local MM2Panel=Instance.new("Frame")
-MM2Panel.Size=UDim2.new(0,0,0,0)
-MM2Panel.Position=UDim2.new(.5,0,0,55)
-MM2Panel.BackgroundColor3=Color3.fromRGB(12,12,25)
-MM2Panel.BorderSizePixel=0
-MM2Panel.BackgroundTransparency=1
-MM2Panel.ClipsDescendants=true
-MM2Panel.Visible=false
-MM2Panel.Parent=G
-Instance.new("UICorner").CornerRadius=UDim.new(0,16)Instance.new("UICorner").Parent=MM2Panel
-
-local MM2Border=Instance.new("Frame")
-MM2Border.Size=UDim2.new(1,4,1,4)
-MM2Border.Position=UDim2.new(0,-2,0,-2)
-MM2Border.BackgroundColor3=Color3.fromRGB(255,80,80)
-MM2Border.BackgroundTransparency=0.7
-MM2Border.BorderSizePixel=0
-MM2Border.ZIndex=0
-MM2Border.Parent=MM2Panel
-Instance.new("UICorner").CornerRadius=UDim.new(0,18)Instance.new("UICorner").Parent=MM2Border
-MM2Panel.ZIndex=1
-
-local MM2Header=Instance.new("Frame")
-MM2Header.Size=UDim2.new(1,0,0,50)
-MM2Header.BackgroundColor3=Color3.fromRGB(18,18,35)
-MM2Header.BorderSizePixel=0
-MM2Header.Parent=MM2Panel
-Instance.new("UICorner").CornerRadius=UDim.new(0,16)Instance.new("UICorner").Parent=MM2Header
-local MM2HeaderB=Instance.new("Frame")
-MM2HeaderB.Size=UDim2.new(1,0,0,25)
-MM2HeaderB.Position=UDim2.new(0,0,0,25)
-MM2HeaderB.BackgroundColor3=Color3.fromRGB(18,18,35)
-MM2HeaderB.BorderSizePixel=0
-MM2HeaderB.Parent=MM2Header
-
-local MM2Title=Instance.new("TextLabel")
-MM2Title.Size=UDim2.new(0,200,0,30)
-MM2Title.Position=UDim2.new(0,15,0,10)
-MM2Title.BackgroundTransparency=1
-MM2Title.Text="MURDER MYSTERY 2"
-MM2Title.TextColor3=Color3.fromRGB(255,100,100)
-MM2Title.Font=Enum.Font.GothamBlack
-MM2Title.TextSize=14
-MM2Title.TextXAlignment=Enum.TextXAlignment.Left
-MM2Title.Parent=MM2Header
-
-local MM2BackBtn=Instance.new("TextButton")
-MM2BackBtn.Size=UDim2.new(0,26,0,26)
-MM2BackBtn.Position=UDim2.new(1,-58,0,12)
-MM2BackBtn.BackgroundColor3=Color3.fromRGB(60,100,200)
-MM2BackBtn.Text="<"
-MM2BackBtn.TextColor3=Color3.fromRGB(255,255,255)
-MM2BackBtn.Font=Enum.Font.GothamBold
-MM2BackBtn.TextSize=14
-MM2BackBtn.Parent=MM2Header
-Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=MM2BackBtn
-
-local MM2CloseBtn=Instance.new("TextButton")
-MM2CloseBtn.Size=UDim2.new(0,26,0,26)
-MM2CloseBtn.Position=UDim2.new(1,-32,0,12)
-MM2CloseBtn.BackgroundColor3=Color3.fromRGB(255,60,60)
-MM2CloseBtn.Text="X"
-MM2CloseBtn.TextColor3=Color3.fromRGB(255,255,255)
-MM2CloseBtn.Font=Enum.Font.GothamBold
-MM2CloseBtn.TextSize=12
-MM2CloseBtn.Parent=MM2Header
-Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=MM2CloseBtn
-
-local MM2Content=Instance.new("ScrollingFrame")
-MM2Content.Size=UDim2.new(1,-20,1,-65)
-MM2Content.Position=UDim2.new(0,10,0,55)
-MM2Content.BackgroundTransparency=1
-MM2Content.BorderSizePixel=0
-MM2Content.ScrollBarThickness=3
-MM2Content.ScrollBarImageColor3=Color3.fromRGB(255,80,80)
-MM2Content.Parent=MM2Panel
-
--- Функции MM2
-local MM2Functions={
-    "Aimbot","ESP","Fly","Noclip","Speed Hack","God Mode","Kill Aura","Reach","Spin","Bunny Hop","Anti-Fling","Chams","X-Ray"
-}
-
-local MM2States={}
-
-for i,funcName in pairs(MM2Functions)do
-    pcall(function()
-        MM2States[funcName]=false
-        
-        local f=Instance.new("Frame")
-        f.Size=UDim2.new(1,0,0,35)
-        f.Position=UDim2.new(0,0,0,(i-1)*38)
-        f.BackgroundColor3=Color3.fromRGB(18,18,35)
-        f.BorderSizePixel=0
-        f.Parent=MM2Content
-        Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=f
-        
-        local l=Instance.new("TextLabel")
-        l.Size=UDim2.new(.6,0,1,0)
-        l.Position=UDim2.new(0,10,0,0)
-        l.BackgroundTransparency=1
-        l.Text=funcName
-        l.TextColor3=Color3.fromRGB(200,220,255)
-        l.Font=Enum.Font.Gotham
-        l.TextSize=12
-        l.TextXAlignment=Enum.TextXAlignment.Left
-        l.Parent=f
-        
-        local btn=Instance.new("TextButton")
-        btn.Size=UDim2.new(0,50,0,22)
-        btn.Position=UDim2.new(1,-55,0,7)
-        btn.BackgroundColor3=Color3.fromRGB(40,40,70)
-        btn.Text="OFF"
-        btn.TextColor3=Color3.fromRGB(150,170,200)
-        btn.Font=Enum.Font.GothamBold
-        btn.TextSize=9
-        btn.Parent=f
-        Instance.new("UICorner").CornerRadius=UDim.new(0,11)Instance.new("UICorner").Parent=btn
-        
-        btn.MouseButton1Click:Connect(function()
-            pcall(function()
-                MM2States[funcName]=not MM2States[funcName]
-                btn.BackgroundColor3=MM2States[funcName]and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
-                btn.Text=MM2States[funcName]and"ON"or"OFF"
-                Notify(funcName..": "..(MM2States[funcName]and"ON"or"OFF"))
-            end)
-        end)
-    end)
-end
-
-MM2Content.CanvasSize=UDim2.new(0,0,0,#MM2Functions*38+5)
-
--- Скрипты лаунчера
 local Scripts={
     {Name="Murder Mystery 2",Icon="[M]",Color=Color3.fromRGB(255,80,80)},
     {Name="+1 Speed",Icon="[S]",Color=Color3.fromRGB(80,180,255)},
-    {Name="Fling Things",Icon="[F]",Color=Color3.fromRGB(80,255,150)},
-    {Name="Universal ESP",Icon="[U]",Color=Color3.fromRGB(255,200,50)},
-    {Name="Universal Fly",Icon="[Y]",Color=Color3.fromRGB(200,100,255)},
 }
 
 for i,script in pairs(Scripts)do
@@ -310,9 +112,6 @@ for i,script in pairs(Scripts)do
         Card.Text=""
         Card.Parent=Content
         Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=Card
-        
-        Card.MouseEnter:Connect(function()T:Create(Card,TweenInfo.new(.3),{BackgroundColor3=Color3.fromRGB(25,25,50)}):Play()end)
-        Card.MouseLeave:Connect(function()T:Create(Card,TweenInfo.new(.3),{BackgroundColor3=Color3.fromRGB(18,18,35)}):Play()end)
         
         local IconFrame=Instance.new("Frame")
         IconFrame.Size=UDim2.new(0,35,0,35)
@@ -342,7 +141,6 @@ for i,script in pairs(Scripts)do
         NameText.TextXAlignment=Enum.TextXAlignment.Left
         NameText.Parent=Card
         
-        -- Execute кнопка
         local ExecuteBtn=Instance.new("TextButton")
         ExecuteBtn.Size=UDim2.new(0,70,0,30)
         ExecuteBtn.Position=UDim2.new(1,-75,0,7)
@@ -357,18 +155,418 @@ for i,script in pairs(Scripts)do
         
         ExecuteBtn.MouseButton1Click:Connect(function()
             if script.Name=="Murder Mystery 2"then
-                -- Открываем MM2 панель
-                CloseLauncherMenu()
+                -- Закрываем лаунчер
+                T:Create(M,TweenInfo.new(.3),{Size=UDim2.new(0,0,0,0),BackgroundTransparency=1}):Play()
                 task.wait(.3)
+                M.Visible=false
+                
+                -- Ждём 5 секунд
+                Notify("Loading MM2...")
+                task.wait(5)
+                
+                -- Открываем MM2 панель 524x524
                 OpenMM2Panel()
-            else
-                Notify("Selected: "..script.Name)
             end
         end)
     end)
 end
 
 Content.CanvasSize=UDim2.new(0,0,0,#Scripts*50+5)
+
+-- ============ MM2 ПАНЕЛЬ 524x524 ============
+local MM2Panel=Instance.new("Frame")
+MM2Panel.Size=UDim2.new(0,0,0,0)
+MM2Panel.Position=UDim2.new(.5,-262,.5,-262)
+MM2Panel.BackgroundColor3=Color3.fromRGB(12,12,25)
+MM2Panel.BorderSizePixel=0
+MM2Panel.BackgroundTransparency=1
+MM2Panel.ClipsDescendants=true
+MM2Panel.Visible=false
+MM2Panel.Parent=G
+Instance.new("UICorner").CornerRadius=UDim.new(0,16)Instance.new("UICorner").Parent=MM2Panel
+
+local MM2Header=Instance.new("Frame")
+MM2Header.Size=UDim2.new(1,0,0,50)
+MM2Header.BackgroundColor3=Color3.fromRGB(18,18,35)
+MM2Header.BorderSizePixel=0
+MM2Header.Parent=MM2Panel
+Instance.new("UICorner").CornerRadius=UDim.new(0,16)Instance.new("UICorner").Parent=MM2Header
+
+local MM2Title=Instance.new("TextLabel")
+MM2Title.Size=UDim2.new(0,250,0,30)
+MM2Title.Position=UDim2.new(0,15,0,10)
+MM2Title.BackgroundTransparency=1
+MM2Title.Text="SYPHIX MM2"
+MM2Title.TextColor3=Color3.fromRGB(255,100,100)
+MM2Title.Font=Enum.Font.GothamBlack
+MM2Title.TextSize=15
+MM2Title.TextXAlignment=Enum.TextXAlignment.Left
+MM2Title.Parent=MM2Header
+
+local MM2CloseBtn=Instance.new("TextButton")
+MM2CloseBtn.Size=UDim2.new(0,26,0,26)
+MM2CloseBtn.Position=UDim2.new(1,-32,0,12)
+MM2CloseBtn.BackgroundColor3=Color3.fromRGB(255,60,60)
+MM2CloseBtn.Text="X"
+MM2CloseBtn.TextColor3=Color3.fromRGB(255,255,255)
+MM2CloseBtn.Font=Enum.Font.GothamBold
+MM2CloseBtn.TextSize=12
+MM2CloseBtn.Parent=MM2Header
+Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=MM2CloseBtn
+
+-- Вкладки MM2
+local MM2Tabs=Instance.new("Frame")
+MM2Tabs.Size=UDim2.new(0,120,1,-50)
+MM2Tabs.Position=UDim2.new(0,0,0,50)
+MM2Tabs.BackgroundColor3=Color3.fromRGB(15,15,28)
+MM2Tabs.BorderSizePixel=0
+MM2Tabs.Parent=MM2Panel
+
+local MM2Content=Instance.new("Frame")
+MM2Content.Size=UDim2.new(1,-130,1,-60)
+MM2Content.Position=UDim2.new(0,125,0,55)
+MM2Content.BackgroundTransparency=1
+MM2Content.Parent=MM2Panel
+
+local MM2TabFrames={}
+local MM2TabButtons={}
+local MM2TabNames={"Combat","Visual","Fling","Others"}
+
+for i=1,4 do
+    local name=MM2TabNames[i]
+    pcall(function()
+        local SF=Instance.new("ScrollingFrame")
+        SF.Size=UDim2.new(1,0,1,0)
+        SF.BackgroundTransparency=1
+        SF.BorderSizePixel=0
+        SF.ScrollBarThickness=2
+        SF.Visible=false
+        SF.Parent=MM2Content
+        MM2TabFrames[name]=SF
+        
+        local b=Instance.new("TextButton")
+        b.Size=UDim2.new(1,-10,0,50)
+        b.Position=UDim2.new(0,5,0,5+(i-1)*55)
+        b.BackgroundColor3=Color3.fromRGB(20,20,38)
+        b.Text=name
+        b.TextColor3=Color3.fromRGB(120,140,180)
+        b.Font=Enum.Font.GothamBold
+        b.TextSize=11
+        b.Parent=MM2Tabs
+        Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
+        
+        b.MouseButton1Click:Connect(function()
+            for n,btn in pairs(MM2TabButtons)do
+                btn.BackgroundColor3=n==name and Color3.fromRGB(60,100,200)or Color3.fromRGB(20,20,38)
+                btn.TextColor3=n==name and Color3.fromRGB(255,255,255)or Color3.fromRGB(120,140,180)
+            end
+            for n,f in pairs(MM2TabFrames)do
+                f.Visible=n==name
+            end
+        end)
+        MM2TabButtons[name]=b
+    end)
+end
+
+-- ============ COMBAT TAB ============
+local CombatSF=MM2TabFrames.Combat
+
+-- Aimbot с подменю
+local AimbotState=false
+local AimbotOpen=false
+
+local AimbotFrame=Instance.new("Frame")
+AimbotFrame.Size=UDim2.new(1,-10,0,40)
+AimbotFrame.Position=UDim2.new(0,5,0,5)
+AimbotFrame.BackgroundColor3=Color3.fromRGB(20,20,38)
+AimbotFrame.BorderSizePixel=0
+AimbotFrame.Parent=CombatSF
+Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=AimbotFrame
+
+local AimbotLabel=Instance.new("TextLabel")
+AimbotLabel.Size=UDim2.new(.55,0,1,0)
+AimbotLabel.Position=UDim2.new(0,10,0,0)
+AimbotLabel.BackgroundTransparency=1
+AimbotLabel.Text="Aimbot"
+AimbotLabel.TextColor3=Color3.fromRGB(200,220,255)
+AimbotLabel.Font=Enum.Font.Gotham
+AimbotLabel.TextSize=12
+AimbotLabel.Parent=AimbotFrame
+
+local AimbotToggle=Instance.new("TextButton")
+AimbotToggle.Size=UDim2.new(0,55,0,25)
+AimbotToggle.Position=UDim2.new(1,-100,0,7)
+AimbotToggle.BackgroundColor3=Color3.fromRGB(40,40,70)
+AimbotToggle.Text="OFF"
+AimbotToggle.TextColor3=Color3.fromRGB(150,170,200)
+AimbotToggle.Font=Enum.Font.GothamBold
+AimbotToggle.TextSize=9
+AimbotToggle.Parent=AimbotFrame
+Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=AimbotToggle
+
+local AimbotExpand=Instance.new("TextButton")
+AimbotExpand.Size=UDim2.new(0,25,0,25)
+AimbotExpand.Position=UDim2.new(1,-35,0,7)
+AimbotExpand.BackgroundColor3=Color3.fromRGB(60,100,200)
+AimbotExpand.Text=">"
+AimbotExpand.TextColor3=Color3.fromRGB(255,255,255)
+AimbotExpand.Font=Enum.Font.GothamBold
+AimbotExpand.TextSize=12
+AimbotExpand.Parent=AimbotFrame
+Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=AimbotExpand
+
+-- Подменю Aimbot
+local AimbotSubmenu=Instance.new("Frame")
+AimbotSubmenu.Size=UDim2.new(1,-10,0,0)
+AimbotSubmenu.Position=UDim2.new(0,5,0,48)
+AimbotSubmenu.BackgroundColor3=Color3.fromRGB(25,25,45)
+AimbotSubmenu.BorderSizePixel=0
+AimbotSubmenu.ClipsDescendants=true
+AimbotSubmenu.Parent=CombatSF
+Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=AimbotSubmenu
+
+local AimbotInfoLabel=Instance.new("TextLabel")
+AimbotInfoLabel.Size=UDim2.new(1,0,0,25)
+AimbotInfoLabel.Position=UDim2.new(0,5,0,5)
+AimbotInfoLabel.BackgroundTransparency=1
+AimbotInfoLabel.Text="Always targets Murderer"
+AimbotInfoLabel.TextColor3=Color3.fromRGB(255,100,100)
+AimbotInfoLabel.Font=Enum.Font.Gotham
+AimbotInfoLabel.TextSize=11
+AimbotInfoLabel.Parent=AimbotSubmenu
+
+-- Радиус слайдер
+local RadiusLabel=Instance.new("TextLabel")
+RadiusLabel.Size=UDim2.new(1,0,0,20)
+RadiusLabel.Position=UDim2.new(0,5,0,35)
+RadiusLabel.BackgroundTransparency=1
+RadiusLabel.Text="Radius: 500"
+RadiusLabel.TextColor3=Color3.fromRGB(150,170,200)
+RadiusLabel.Font=Enum.Font.Gotham
+RadiusLabel.TextSize=10
+RadiusLabel.Parent=AimbotSubmenu
+
+local RadiusSlider=Instance.new("TextButton")
+RadiusSlider.Size=UDim2.new(1,-20,0,8)
+RadiusSlider.Position=UDim2.new(0,10,0,55)
+RadiusSlider.BackgroundColor3=Color3.fromRGB(40,40,70)
+RadiusSlider.Text=""
+RadiusSlider.BorderSizePixel=0
+RadiusSlider.Parent=AimbotSubmenu
+Instance.new("UICorner").CornerRadius=UDim.new(1,0)Instance.new("UICorner").Parent=RadiusSlider
+
+local RadiusFill=Instance.new("Frame")
+RadiusFill.Size=UDim2.new(0.4,0,1,0)
+RadiusFill.BackgroundColor3=Color3.fromRGB(255,80,80)
+RadiusFill.BorderSizePixel=0
+RadiusFill.Parent=RadiusSlider
+Instance.new("UICorner").CornerRadius=UDim.new(1,0)Instance.new("UICorner").Parent=RadiusFill
+
+AimbotExpand.MouseButton1Click:Connect(function()
+    AimbotOpen=not AimbotOpen
+    if AimbotOpen then
+        T:Create(AimbotSubmenu,TweenInfo.new(.4,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{Size=UDim2.new(1,-10,0,70)}):Play()
+        AimbotExpand.Text="v"
+    else
+        T:Create(AimbotSubmenu,TweenInfo.new(.3,Enum.EasingStyle.Quad,Enum.EasingDirection.In),{Size=UDim2.new(1,-10,0,0)}):Play()
+        AimbotExpand.Text=">"
+    end
+end)
+
+AimbotToggle.MouseButton1Click:Connect(function()
+    AimbotState=not AimbotState
+    AimbotToggle.BackgroundColor3=AimbotState and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
+    AimbotToggle.Text=AimbotState and"ON"or"OFF"
+end)
+
+-- Kill All с белым списком
+local KillAllState=false
+local KillAllOpen=false
+local Whitelist={}
+
+local KillAllFrame=Instance.new("Frame")
+KillAllFrame.Size=UDim2.new(1,-10,0,40)
+KillAllFrame.Position=UDim2.new(0,5,0,125)
+KillAllFrame.BackgroundColor3=Color3.fromRGB(20,20,38)
+KillAllFrame.BorderSizePixel=0
+KillAllFrame.Parent=CombatSF
+Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=KillAllFrame
+
+local KillAllLabel=Instance.new("TextLabel")
+KillAllLabel.Size=UDim2.new(.55,0,1,0)
+KillAllLabel.Position=UDim2.new(0,10,0,0)
+KillAllLabel.BackgroundTransparency=1
+KillAllLabel.Text="Kill All"
+KillAllLabel.TextColor3=Color3.fromRGB(200,220,255)
+KillAllLabel.Font=Enum.Font.Gotham
+KillAllLabel.TextSize=12
+KillAllLabel.Parent=KillAllFrame
+
+local KillAllToggle=Instance.new("TextButton")
+KillAllToggle.Size=UDim2.new(0,55,0,25)
+KillAllToggle.Position=UDim2.new(1,-100,0,7)
+KillAllToggle.BackgroundColor3=Color3.fromRGB(40,40,70)
+KillAllToggle.Text="OFF"
+KillAllToggle.TextColor3=Color3.fromRGB(150,170,200)
+KillAllToggle.Font=Enum.Font.GothamBold
+KillAllToggle.TextSize=9
+KillAllToggle.Parent=KillAllFrame
+Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=KillAllToggle
+
+local KillAllExpand=Instance.new("TextButton")
+KillAllExpand.Size=UDim2.new(0,25,0,25)
+KillAllExpand.Position=UDim2.new(1,-35,0,7)
+KillAllExpand.BackgroundColor3=Color3.fromRGB(60,100,200)
+KillAllExpand.Text=">"
+KillAllExpand.TextColor3=Color3.fromRGB(255,255,255)
+KillAllExpand.Font=Enum.Font.GothamBold
+KillAllExpand.TextSize=12
+KillAllExpand.Parent=KillAllFrame
+Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=KillAllExpand
+
+-- Подменю Kill All (белый список)
+local KillAllSubmenu=Instance.new("Frame")
+KillAllSubmenu.Size=UDim2.new(1,-10,0,0)
+KillAllSubmenu.Position=UDim2.new(0,5,0,168)
+KillAllSubmenu.BackgroundColor3=Color3.fromRGB(25,25,45)
+KillAllSubmenu.BorderSizePixel=0
+KillAllSubmenu.ClipsDescendants=true
+KillAllSubmenu.Parent=CombatSF
+Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=KillAllSubmenu
+
+local WhitelistLabel=Instance.new("TextLabel")
+WhitelistLabel.Size=UDim2.new(1,0,0,25)
+WhitelistLabel.Position=UDim2.new(0,5,0,5)
+WhitelistLabel.BackgroundTransparency=1
+WhitelistLabel.Text="Whitelist (won't be killed):"
+WhitelistLabel.TextColor3=Color3.fromRGB(200,220,255)
+WhitelistLabel.Font=Enum.Font.GothamBold
+WhitelistLabel.TextSize=10
+WhitelistLabel.Parent=KillAllSubmenu
+
+local WhitelistScrolling=Instance.new("ScrollingFrame")
+WhitelistScrolling.Size=UDim2.new(1,-10,0,200)
+WhitelistScrolling.Position=UDim2.new(0,5,0,32)
+WhitelistScrolling.BackgroundColor3=Color3.fromRGB(18,18,30)
+WhitelistScrolling.BorderSizePixel=0
+WhitelistScrolling.Parent=KillAllSubmenu
+Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=WhitelistScrolling
+
+local function RefreshWhitelist()
+    pcall(function()
+        for _,c in pairs(WhitelistScrolling:GetChildren())do
+            if c:IsA("TextButton")then c:Destroy()end
+        end
+        local y=0
+        for _,p in pairs(P:GetPlayers())do
+            if p~=L then
+                local isWhite=Whitelist[p.Name]
+                local b=Instance.new("TextButton")
+                b.Size=UDim2.new(1,-10,0,28)
+                b.Position=UDim2.new(0,5,0,y)
+                b.BackgroundColor3=isWhite and Color3.fromRGB(50,200,100)or Color3.fromRGB(30,30,50)
+                b.Text=p.Name
+                b.TextColor3=isWhite and Color3.fromRGB(15,15,25)or Color3.fromRGB(200,220,255)
+                b.Font=Enum.Font.GothamBold
+                b.TextSize=10
+                b.Parent=WhitelistScrolling
+                Instance.new("UICorner").CornerRadius=UDim.new(0,4)Instance.new("UICorner").Parent=b
+                
+                b.MouseButton1Click:Connect(function()
+                    if Whitelist[p.Name]then
+                        Whitelist[p.Name]=nil
+                    else
+                        Whitelist[p.Name]=true
+                    end
+                    RefreshWhitelist()
+                end)
+                y+=32
+            end
+        end
+        WhitelistScrolling.CanvasSize=UDim2.new(0,0,0,y)
+    end)
+end
+RefreshWhitelist()
+
+KillAllExpand.MouseButton1Click:Connect(function()
+    KillAllOpen=not KillAllOpen
+    if KillAllOpen then
+        T:Create(KillAllSubmenu,TweenInfo.new(.4,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{Size=UDim2.new(1,-10,0,240)}):Play()
+        KillAllExpand.Text="v"
+        RefreshWhitelist()
+    else
+        T:Create(KillAllSubmenu,TweenInfo.new(.3,Enum.EasingStyle.Quad,Enum.EasingDirection.In),{Size=UDim2.new(1,-10,0,0)}):Play()
+        KillAllExpand.Text=">"
+    end
+end)
+
+KillAllToggle.MouseButton1Click:Connect(function()
+    KillAllState=not KillAllState
+    KillAllToggle.BackgroundColor3=KillAllState and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
+    KillAllToggle.Text=KillAllState and"ON"or"OFF"
+    Notify("Kill All: "..(KillAllState and"ON"or"OFF"))
+end)
+
+CombatSF.CanvasSize=UDim2.new(0,0,0,420)
+
+-- ============ VISUAL TAB (пустая) ============
+local VisualSF=MM2TabFrames.Visual
+local VisualPlaceholder=Instance.new("TextLabel")
+VisualPlaceholder.Size=UDim2.new(1,0,0,30)
+VisualPlaceholder.Position=UDim2.new(0,0,0,10)
+VisualPlaceholder.BackgroundTransparency=1
+VisualPlaceholder.Text="Visual functions coming soon"
+VisualPlaceholder.TextColor3=Color3.fromRGB(100,100,150)
+VisualPlaceholder.Font=Enum.Font.Gotham
+VisualPlaceholder.TextSize=12
+VisualPlaceholder.Parent=VisualSF
+
+-- ============ FLING TAB (пустая) ============
+local FlingSF=MM2TabFrames.Fling
+local FlingPlaceholder=Instance.new("TextLabel")
+FlingPlaceholder.Size=UDim2.new(1,0,0,30)
+FlingPlaceholder.Position=UDim2.new(0,0,0,10)
+FlingPlaceholder.BackgroundTransparency=1
+FlingPlaceholder.Text="Fling functions coming soon"
+FlingPlaceholder.TextColor3=Color3.fromRGB(100,100,150)
+FlingPlaceholder.Font=Enum.Font.Gotham
+FlingPlaceholder.TextSize=12
+FlingPlaceholder.Parent=FlingSF
+
+-- ============ OTHERS TAB (пустая) ============
+local OthersSF=MM2TabFrames.Others
+local OthersPlaceholder=Instance.new("TextLabel")
+OthersPlaceholder.Size=UDim2.new(1,0,0,30)
+OthersPlaceholder.Position=UDim2.new(0,0,0,10)
+OthersPlaceholder.BackgroundTransparency=1
+OthersPlaceholder.Text="Other functions coming soon"
+OthersPlaceholder.TextColor3=Color3.fromRGB(100,100,150)
+OthersPlaceholder.Font=Enum.Font.Gotham
+OthersPlaceholder.TextSize=12
+OthersPlaceholder.Parent=OthersSF
+
+-- Инициализация вкладок
+MM2TabFrames.Combat.Visible=true
+MM2TabButtons.Combat.BackgroundColor3=Color3.fromRGB(60,100,200)
+MM2TabButtons.Combat.TextColor3=Color3.fromRGB(255,255,255)
+
+-- ============ Функции открытия ============
+function OpenMM2Panel()
+    MM2Panel.Visible=true
+    MM2Panel.Size=UDim2.new(0,0,0,0)
+    MM2Panel.BackgroundTransparency=1
+    T:Create(MM2Panel,TweenInfo.new(.6,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{
+        Size=UDim2.new(0,524,0,524),
+        BackgroundTransparency=0,
+        Position=UDim2.new(.5,-262,.5,-262)
+    }):Play()
+end
+
+MM2CloseBtn.MouseButton1Click:Connect(function()
+    T:Create(MM2Panel,TweenInfo.new(.3),{Size=UDim2.new(0,0,0,0),BackgroundTransparency=1,Position=UDim2.new(.5,0,.5,0)}):Play()
+    task.wait(.3)
+    MM2Panel.Visible=false
+end)
 
 -- Перетаскивание TopBar
 local draggingBar=false
@@ -390,68 +588,31 @@ U.InputChanged:Connect(function(i)
     if draggingBar and i.UserInputType==Enum.UserInputType.MouseMovement then
         local d=i.Position-barStart
         TopBar.Position=UDim2.new(barPos.X.Scale,barPos.X.Offset+d.X,barPos.Y.Scale,barPos.Y.Offset+d.Y)
-        M.Position=UDim2.new(TopBar.Position.X.Scale,TopBar.Position.X.Offset-100,TopBar.Position.Y.Scale,TopBar.Position.Y.Offset+50)
-        MM2Panel.Position=UDim2.new(TopBar.Position.X.Scale,TopBar.Position.X.Offset-100,TopBar.Position.Y.Scale,TopBar.Position.Y.Offset+50)
     end
 end)
 
--- Функции открытия
+-- Открытие лаунчера
 local launcherOpen=false
-local function ToggleLauncherMenu()
+local function ToggleLauncher()
     launcherOpen=not launcherOpen
     if launcherOpen then
         M.Visible=true
         M.Size=UDim2.new(0,0,0,0)
-        M.Position=UDim2.new(TopBar.Position.X.Scale,TopBar.Position.X.Offset-100,TopBar.Position.Y.Scale,TopBar.Position.Y.Offset+50)
-        T:Create(M,TweenInfo.new(.5,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Size=UDim2.new(0,400,0,420),BackgroundTransparency=0}):Play()
+        T:Create(M,TweenInfo.new(.5,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Size=UDim2.new(0,300,0,180),BackgroundTransparency=0}):Play()
         TopBarArrow.Text="^"
     else
-        CloseLauncherMenu()
+        T:Create(M,TweenInfo.new(.3),{Size=UDim2.new(0,0,0,0),BackgroundTransparency=1}):Play()
+        TopBarArrow.Text="v"
+        task.wait(.3)
+        M.Visible=false
     end
 end
 
-function CloseLauncherMenu()
-    launcherOpen=false
-    T:Create(M,TweenInfo.new(.35,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Size=UDim2.new(0,0,0,0),BackgroundTransparency=1}):Play()
-    TopBarArrow.Text="v"
-    task.wait(.35)
-    M.Visible=false
-end
-
-function OpenMM2Panel()
-    MM2Panel.Visible=true
-    MM2Panel.Size=UDim2.new(0,0,0,0)
-    MM2Panel.Position=UDim2.new(TopBar.Position.X.Scale,TopBar.Position.X.Offset-100,TopBar.Position.Y.Scale,TopBar.Position.Y.Offset+50)
-    T:Create(MM2Panel,TweenInfo.new(.5,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Size=UDim2.new(0,380,0,400),BackgroundTransparency=0}):Play()
-end
-
-function CloseMM2Panel()
-    T:Create(MM2Panel,TweenInfo.new(.35,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Size=UDim2.new(0,0,0,0),BackgroundTransparency=1}):Play()
-    task.wait(.35)
-    MM2Panel.Visible=false
-end
-
-TopBarArrow.MouseButton1Click:Connect(ToggleLauncherMenu)
+TopBarArrow.MouseButton1Click:Connect(ToggleLauncher)
 TopBarText.InputBegan:Connect(function(i)
     if i.UserInputType==Enum.UserInputType.MouseButton1 and not draggingBar then
-        ToggleLauncherMenu()
+        ToggleLauncher()
     end
 end)
-CloseBtn.MouseButton1Click:Connect(CloseLauncherMenu)
-MM2CloseBtn.MouseButton1Click:Connect(CloseMM2Panel)
-MM2BackBtn.MouseButton1Click:Connect(function()
-    CloseMM2Panel()
-    task.wait(.3)
-    OpenLauncherMenu()
-end)
-
-function OpenLauncherMenu()
-    launcherOpen=true
-    M.Visible=true
-    M.Size=UDim2.new(0,0,0,0)
-    M.Position=UDim2.new(TopBar.Position.X.Scale,TopBar.Position.X.Offset-100,TopBar.Position.Y.Scale,TopBar.Position.Y.Offset+50)
-    T:Create(M,TweenInfo.new(.5,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Size=UDim2.new(0,400,0,420),BackgroundTransparency=0}):Play()
-    TopBarArrow.Text="^"
-end
 
 Notify("SYPHIX HUB loaded!")
