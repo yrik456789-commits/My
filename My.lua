@@ -1,4 +1,4 @@
--- Syphixman MM2 v28 Final | Everything Restored + All Fixes
+-- Syphixman MM2 v30 | FIXED + All Features
 local P,R,U,T,C,L=game:GetService("Players"),game:GetService("RunService"),game:GetService("UserInputService"),game:GetService("TweenService"),workspace.CurrentCamera,game:GetService("Players").LocalPlayer
 local VU=game:GetService("VirtualUser")
 local Lighting=game:GetService("Lighting")
@@ -65,26 +65,38 @@ for i=1,50 do
     Stars[#Stars+1]=s
 end
 
-local LogoIcon=Instance.new("TextLabel")LogoIcon.Size=UDim2.new(0,100,0,100)LogoIcon.Position=UDim2.new(.5,-50,.5,-160)
+-- FIXED надпись
+local FixedText=Instance.new("TextLabel")
+FixedText.Size=UDim2.new(0,200,0,40)
+FixedText.Position=UDim2.new(.5,-100,.5,-200)
+FixedText.BackgroundTransparency=1
+FixedText.Text="FIXED"
+FixedText.TextColor3=Color3.fromRGB(0,255,100)
+FixedText.Font=Enum.Font.GothamBlack
+FixedText.TextSize=24
+FixedText.TextTransparency=1
+FixedText.Parent=IntroGui
+
+local LogoIcon=Instance.new("TextLabel")LogoIcon.Size=UDim2.new(0,100,0,100)LogoIcon.Position=UDim2.new(.5,-50,.5,-140)
 LogoIcon.BackgroundTransparency=1 LogoIcon.Text="🔷"LogoIcon.TextSize=70 LogoIcon.TextTransparency=1 LogoIcon.Parent=IntroGui
 
-local TitleText=Instance.new("TextLabel")TitleText.Size=UDim2.new(0,500,0,60)TitleText.Position=UDim2.new(.5,-250,.5,-40)
+local TitleText=Instance.new("TextLabel")TitleText.Size=UDim2.new(0,500,0,60)TitleText.Position=UDim2.new(.5,-250,.5,-20)
 TitleText.BackgroundTransparency=1 TitleText.Text="SYPHIXMAN"TitleText.TextColor3=Color3.fromRGB(100,180,255)
 TitleText.Font=Enum.Font.GothamBlack TitleText.TextSize=48 TitleText.TextTransparency=1 TitleText.Parent=IntroGui
 
-local Line=Instance.new("Frame")Line.Size=UDim2.new(0,0,0,3)Line.Position=UDim2.new(.5,0,.5,50)
+local Line=Instance.new("Frame")Line.Size=UDim2.new(0,0,0,3)Line.Position=UDim2.new(.5,0,.5,60)
 Line.BackgroundColor3=Color3.fromRGB(80,140,255)Line.BorderSizePixel=0 Line.Parent=IntroGui
 Instance.new("UICorner").CornerRadius=UDim.new(1,0)Instance.new("UICorner").Parent=Line
 
-local BetaText=Instance.new("TextLabel")BetaText.Size=UDim2.new(0,300,0,40)BetaText.Position=UDim2.new(.5,-150,.5,65)
+local BetaText=Instance.new("TextLabel")BetaText.Size=UDim2.new(0,300,0,40)BetaText.Position=UDim2.new(.5,-150,.5,75)
 BetaText.BackgroundTransparency=1 BetaText.Text="BETA VERSION"BetaText.TextColor3=Color3.fromRGB(80,140,255)
 BetaText.Font=Enum.Font.GothamBold BetaText.TextSize=22 BetaText.TextTransparency=1 BetaText.Parent=IntroGui
 
-local VerText=Instance.new("TextLabel")VerText.Size=UDim2.new(0,300,0,30)VerText.Position=UDim2.new(.5,-150,.5,115)
-VerText.BackgroundTransparency=1 VerText.Text="v28.0 | by Ryzen"VerText.TextColor3=Color3.fromRGB(100,100,150)
+local VerText=Instance.new("TextLabel")VerText.Size=UDim2.new(0,300,0,30)VerText.Position=UDim2.new(.5,-150,.5,125)
+VerText.BackgroundTransparency=1 VerText.Text="v30.0 | by Ryzen"VerText.TextColor3=Color3.fromRGB(100,100,150)
 VerText.Font=Enum.Font.Gotham VerText.TextSize=16 VerText.TextTransparency=1 VerText.Parent=IntroGui
 
-local ProgF=Instance.new("Frame")ProgF.Size=UDim2.new(0,300,0,6)ProgF.Position=UDim2.new(.5,-150,.5,160)
+local ProgF=Instance.new("Frame")ProgF.Size=UDim2.new(0,300,0,6)ProgF.Position=UDim2.new(.5,-150,.5,170)
 ProgF.BackgroundColor3=Color3.fromRGB(20,20,40)ProgF.BorderSizePixel=0 ProgF.BackgroundTransparency=1 ProgF.Parent=IntroGui
 Instance.new("UICorner").CornerRadius=UDim.new(1,0)Instance.new("UICorner").Parent=ProgF
 
@@ -108,19 +120,16 @@ LogoDot.BackgroundColor3=Color3.fromRGB(80,140,255)LogoDot.BorderSizePixel=0 Log
 Instance.new("UICorner").CornerRadius=UDim.new(1,0)Instance.new("UICorner").Parent=LogoDot
 
 local TitleLabel=Instance.new("TextLabel")TitleLabel.Size=UDim2.new(0,180,0,25)TitleLabel.Position=UDim2.new(0,36,0,10)
-TitleLabel.BackgroundTransparency=1 TitleLabel.Text="🔷 "..t("Title")TitleLabel.TextColor3=Color3.fromRGB(200,220,255)
+TitleLabel.BackgroundTransparency=1 TitleLabel.Text="[FIXED] "..t("Title")TitleLabel.TextColor3=Color3.fromRGB(200,220,255)
 TitleLabel.Font=Enum.Font.GothamBlack TitleLabel.TextSize=14 TitleLabel.TextXAlignment=Enum.TextXAlignment.Left TitleLabel.Parent=TB
 
 local CB=Instance.new("TextButton")CB.Size=UDim2.new(0,28,0,28)CB.Position=UDim2.new(1,-34,0,8)
-CB.BackgroundColor3=Color3.fromRGB(255,80,80)CB.Text="✕"CB.TextColor3=Color3.fromRGB(255,255,255)
+CB.BackgroundColor3=Color3.fromRGB(255,80,80)CB.Text="X"CB.TextColor3=Color3.fromRGB(255,255,255)
 CB.Font=Enum.Font.GothamBold CB.TextSize=13 CB.Parent=TB
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=CB
 CB.MouseEnter:Connect(function()T:Create(CB,TweenInfo.new(.3),{Size=UDim2.new(0,32,0,32),BackgroundColor3=Color3.fromRGB(255,120,120)}):Play()end)
 CB.MouseLeave:Connect(function()T:Create(CB,TweenInfo.new(.3),{Size=UDim2.new(0,28,0,28),BackgroundColor3=Color3.fromRGB(255,80,80)}):Play()end)
-CB.MouseButton1Click:Connect(function()
-    T:Create(M,TweenInfo.new(.4,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{BackgroundTransparency=1,Size=UDim2.new(0,0,0,0),Position=UDim2.new(.5,0,.5,0)}):Play()
-    task.wait(.4)G:Destroy()
-end)
+CB.MouseButton1Click:Connect(function()G:Destroy()end)
 
 local dragging=false local dragStart=nil local startPos=nil
 TB.InputBegan:Connect(function(input)if input.UserInputType==Enum.UserInputType.MouseButton1 then dragging=true dragStart=input.Position startPos=M.Position end end)
@@ -131,7 +140,7 @@ local LP=Instance.new("Frame")LP.Size=UDim2.new(0,110,1,-45)LP.Position=UDim2.ne
 local CA=Instance.new("Frame")CA.Size=UDim2.new(1,-120,1,-60)CA.Position=UDim2.new(0,115,0,60)CA.BackgroundTransparency=1 CA.Parent=M
 
 local TabFrames={}local Tabs={}
-local TabData={{"Combat","⚔","Combat"},{"Visual","👁","Visual"},{"Anim","🎭","Anim"},{"Fling","💥","Fling"},{"World","🌍","World"},{"Settings","⚙","Settings"}}
+local TabData={{"Combat","[=]","Combat"},{"Visual","[o]","Visual"},{"Anim","[~]","Anim"},{"Fling","[!]","Fling"},{"World","[@]","World"},{"Settings","[#]","Settings"}}
 
 for _,tab in pairs(TabData)do
     local SF=Instance.new("ScrollingFrame")SF.Size=UDim2.new(1,0,1,0)SF.BackgroundTransparency=1 SF.BorderSizePixel=0
@@ -139,27 +148,21 @@ for _,tab in pairs(TabData)do
     TabFrames[tab[1]]=SF
 end
 
--- Исправленное переключение вкладок
 local function SwitchTab(name)
     if TabSwitching then return end
     TabSwitching=true
-    
     for n,b in pairs(Tabs)do
-        T:Create(b,TweenInfo.new(.3,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{
+        T:Create(b,TweenInfo.new(.3),{
             BackgroundColor3=n==name and Color3.fromRGB(60,100,200)or Color3.fromRGB(25,25,45),
             TextColor3=n==name and Color3.fromRGB(255,255,255)or Color3.fromRGB(120,140,180)
         }):Play()
     end
-    
-    -- Сначала скрываем все
     for n,f in pairs(TabFrames)do
         if n~=name then
-            T:Create(f,TweenInfo.new(.2,Enum.EasingStyle.Quad,Enum.EasingDirection.In),{Position=UDim2.new(0,-30,0,0)}):Play()
+            T:Create(f,TweenInfo.new(.2),{Position=UDim2.new(0,-30,0,0)}):Play()
             task.delay(.2,function()if n~=name then f.Visible=false end end)
         end
     end
-    
-    -- Потом показываем нужную
     task.delay(.2,function()
         local f=TabFrames[name]
         f.Visible=true
@@ -262,17 +265,17 @@ end
 
 -- ============ FILL TABS ============
 local CombatSF=TabFrames.Combat
-mkToggle(CombatSF,t("Aimbot"),"🔫",5,"Aim")
-mkToggle(CombatSF,t("FlingAll"),"💥",51,"Fl")
-mkToggle(CombatSF,t("Fly"),"🕊",97,"Fly")
-mkToggle(CombatSF,t("Noclip"),"👻",143,"NC")
-mkToggle(CombatSF,t("SpeedHack"),"⚡",189,"SP")
-mkToggle(CombatSF,t("GodMode"),"🛡",235,"GM")
-mkToggle(CombatSF,t("KillAura"),"⚔",281,"KA")
-mkToggle(CombatSF,t("Reach"),"📏",327,"Reach")
-mkToggle(CombatSF,t("Spin"),"🌀",373,"Spin")
-mkToggle(CombatSF,t("BunnyHop"),"🦘",419,"BunnyHop")
-mkToggle(CombatSF,t("AntiFling"),"🛡",465,"AntiFling")
+mkToggle(CombatSF,t("Aimbot"),"[T]",5,"Aim")
+mkToggle(CombatSF,t("FlingAll"),"[F]",51,"Fl")
+mkToggle(CombatSF,t("Fly"),"[Y]",97,"Fly")
+mkToggle(CombatSF,t("Noclip"),"[N]",143,"NC")
+mkToggle(CombatSF,t("SpeedHack"),"[S]",189,"SP")
+mkToggle(CombatSF,t("GodMode"),"[G]",235,"GM")
+mkToggle(CombatSF,t("KillAura"),"[K]",281,"KA")
+mkToggle(CombatSF,t("Reach"),"[R]",327,"Reach")
+mkToggle(CombatSF,t("Spin"),"[P]",373,"Spin")
+mkToggle(CombatSF,t("BunnyHop"),"[B]",419,"BunnyHop")
+mkToggle(CombatSF,t("AntiFling"),"[A]",465,"AntiFling")
 mkSlider(CombatSF,t("AimRadius"),516,100,2000,500,"AimRadius")
 mkSlider(CombatSF,t("AimFOV"),555,30,360,90,"AimFOV")
 mkSlider(CombatSF,t("FlingPower"),594,1,50,15,"FlPower")
@@ -282,28 +285,26 @@ mkSlider(CombatSF,t("SpinSpeed"),711,1,50,10,"SpinSpeed")
 CombatSF.CanvasSize=UDim2.new(0,0,0,760)
 
 local VisualSF=TabFrames.Visual
-mkToggle(VisualSF,"ESP","👁",5,"ESP")
-mkToggle(VisualSF,t("InnocentESP"),"🟢",51,"InnESP")
-mkToggle(VisualSF,t("MurdererESP"),"🔴",97,"MurESP")
-mkToggle(VisualSF,t("SheriffESP"),"🔵",143,"ShESP")
-mkToggle(VisualSF,t("Tracers"),"📛",189,"Tr")
-mkToggle(VisualSF,t("Chams"),"👻",235,"Ch")
-mkToggle(VisualSF,t("Fullbright"),"🌟",281,"FB")
-mkToggle(VisualSF,t("RainbowESP"),"🌈",327,"Rainbow")
-mkToggle(VisualSF,t("XRay"),"💀",373,"XRay")
-VisualSF.CanvasSize=UDim2.new(0,0,0,420)
+mkToggle(VisualSF,"ESP","[E]",5,"ESP")
+mkToggle(VisualSF,t("InnocentESP"),"[I]",51,"InnESP")
+mkToggle(VisualSF,t("MurdererESP"),"[M]",97,"MurESP")
+mkToggle(VisualSF,t("SheriffESP"),"[H]",143,"ShESP")
+mkToggle(VisualSF,t("Tracers"),"[L]",189,"Tr")
+mkToggle(VisualSF,t("Chams"),"[C]",235,"Ch")
+mkToggle(VisualSF,t("XRay"),"[X]",281,"XRay")
+VisualSF.CanvasSize=UDim2.new(0,0,0,330)
 
 local AnimSF=TabFrames.Anim
-mkToggle(AnimSF,t("FreeAnim"),"🎭",5,"FA")
-mkToggle(AnimSF,t("InfJump"),"🦘",51,"InfJump")
-mkToggle(AnimSF,t("NoFall"),"🍃",97,"NoFall")
+mkToggle(AnimSF,t("FreeAnim"),"[Z]",5,"FA")
+mkToggle(AnimSF,t("InfJump"),"[J]",51,"InfJump")
+mkToggle(AnimSF,t("NoFall"),"[D]",97,"NoFall")
 mkSlider(AnimSF,t("AnimSpeed"),147,.1,5,1,"AnimSpeed")
 AnimSF.CanvasSize=UDim2.new(0,0,0,190)
 
 -- FLING
 local FlingSF=TabFrames.Fling
 local SelectLabel=Instance.new("TextLabel")SelectLabel.Size=UDim2.new(1,-10,0,30)SelectLabel.Position=UDim2.new(0,5,0,5)
-SelectLabel.BackgroundTransparency=1 SelectLabel.Text="💥 "..t("SelectPlayer")..":"
+SelectLabel.BackgroundTransparency=1 SelectLabel.Text="[!] "..t("SelectPlayer")..":"
 SelectLabel.TextColor3=Color3.fromRGB(200,220,255)SelectLabel.Font=Enum.Font.GothamBold SelectLabel.TextSize=14
 SelectLabel.TextXAlignment=Enum.TextXAlignment.Left SelectLabel.Parent=FlingSF
 
@@ -312,7 +313,7 @@ PlayerList.BackgroundColor3=Color3.fromRGB(25,25,45)PlayerList.BorderSizePixel=0
 Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=PlayerList
 
 local SelectedLabel=Instance.new("TextLabel")SelectedLabel.Size=UDim2.new(1,-10,0,35)SelectedLabel.Position=UDim2.new(0,5,0,295)
-SelectedLabel.BackgroundColor3=Color3.fromRGB(25,25,45)SelectedLabel.Text="👤 "..t("SelectPlayer")..": "..t("OFF")
+SelectedLabel.BackgroundColor3=Color3.fromRGB(25,25,45)SelectedLabel.Text="[?] "..t("SelectPlayer")..": "..t("OFF")
 SelectedLabel.TextColor3=Color3.fromRGB(100,180,255)SelectedLabel.Font=Enum.Font.GothamBold SelectedLabel.TextSize=13 SelectedLabel.Parent=FlingSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=SelectedLabel
 
@@ -328,7 +329,7 @@ local function RefreshPlayerList()
             Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=b
             b.MouseEnter:Connect(function()if S.SelectedPlayer~=p then T:Create(b,TweenInfo.new(.2),{BackgroundColor3=Color3.fromRGB(45,45,75)}):Play()end end)
             b.MouseLeave:Connect(function()if S.SelectedPlayer~=p then T:Create(b,TweenInfo.new(.2),{BackgroundColor3=Color3.fromRGB(35,35,60)}):Play()end end)
-            b.MouseButton1Click:Connect(function()S.SelectedPlayer=p SelectedLabel.Text="👤 "..t("SelectPlayer")..": "..p.Name RefreshPlayerList()end)
+            b.MouseButton1Click:Connect(function()S.SelectedPlayer=p SelectedLabel.Text="[?] "..t("SelectPlayer")..": "..p.Name RefreshPlayerList()end)
             y+=40
         end
     end
@@ -337,13 +338,13 @@ end
 RefreshPlayerList()
 
 local RefreshBtn=Instance.new("TextButton")RefreshBtn.Size=UDim2.new(1,-10,0,30)RefreshBtn.Position=UDim2.new(0,5,0,335)
-RefreshBtn.BackgroundColor3=Color3.fromRGB(35,35,60)RefreshBtn.Text="🔄"RefreshBtn.TextColor3=Color3.fromRGB(200,220,255)
-RefreshBtn.Font=Enum.Font.GothamBold RefreshBtn.TextSize=14 RefreshBtn.Parent=FlingSF
+RefreshBtn.BackgroundColor3=Color3.fromRGB(35,35,60)RefreshBtn.Text="[...] "..t("RefreshList")RefreshBtn.TextColor3=Color3.fromRGB(200,220,255)
+RefreshBtn.Font=Enum.Font.GothamBold RefreshBtn.TextSize=12 RefreshBtn.Parent=FlingSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=RefreshBtn
 RefreshBtn.MouseButton1Click:Connect(RefreshPlayerList)
 
 local FlingBtn=Instance.new("TextButton")FlingBtn.Size=UDim2.new(1,-10,0,50)FlingBtn.Position=UDim2.new(0,5,0,370)
-FlingBtn.BackgroundColor3=Color3.fromRGB(255,60,60)FlingBtn.Text="💥 "..t("FlingButton")
+FlingBtn.BackgroundColor3=Color3.fromRGB(255,60,60)FlingBtn.Text="[!] "..t("FlingButton")
 FlingBtn.TextColor3=Color3.fromRGB(255,255,255)FlingBtn.Font=Enum.Font.GothamBlack FlingBtn.TextSize=16 FlingBtn.Parent=FlingSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=FlingBtn
 FlingBtn.MouseEnter:Connect(function()T:Create(FlingBtn,TweenInfo.new(.3),{Size=UDim2.new(1,-10,0,55),BackgroundColor3=Color3.fromRGB(255,80,80)}):Play()end)
@@ -351,23 +352,28 @@ FlingBtn.MouseLeave:Connect(function()T:Create(FlingBtn,TweenInfo.new(.3),{Size=
 FlingBtn.MouseButton1Click:Connect(function()
     if S.SelectedPlayer and S.SelectedPlayer.Character and S.SelectedPlayer.Character:FindFirstChild("HumanoidRootPart")then
         local hrp=S.SelectedPlayer.Character.HumanoidRootPart
-        hrp.Velocity=Vector3.new(math.random(-3000,3000),5000,math.random(-3000,3000))
-        hrp.RotVelocity=Vector3.new(math.random(-300,300),math.random(-300,300),math.random(-300,300))
-        task.delay(1,function()if S.SelectedPlayer.Character and S.SelectedPlayer.Character:FindFirstChild("HumanoidRootPart")then S.SelectedPlayer.Character.HumanoidRootPart.CFrame=CFrame.new(0,-500,0)end end)
-        Notify("💥 "..S.SelectedPlayer.Name.." "..t("Flung"))
-    else Notify("👤 "..t("SelectPlayer"))end
+        hrp.CFrame=hrp.CFrame+Vector3.new(0,50,0)
+        hrp.Velocity=Vector3.new(math.random(-5000,5000),10000,math.random(-5000,5000))
+        hrp.RotVelocity=Vector3.new(math.random(-500,500),math.random(-500,500),math.random(-500,500))
+        task.delay(.5,function()
+            if S.SelectedPlayer.Character and S.SelectedPlayer.Character:FindFirstChild("HumanoidRootPart")then
+                S.SelectedPlayer.Character.HumanoidRootPart.CFrame=CFrame.new(0,-1000,0)
+            end
+        end)
+        Notify("[!] "..S.SelectedPlayer.Name.." "..t("Flung"))
+    else Notify("[?] "..t("SelectPlayer"))end
 end)
 FlingSF.CanvasSize=UDim2.new(0,0,0,430)
 
 -- WORLD
 local WorldSF=TabFrames.World
-mkButton(WorldSF,t("TeleportLobby"),"🏠",5,Color3.fromRGB(60,100,200),function()
-    local lobby=workspace:FindFirstChild("Lobby")or workspace:FindFirstChild("Spawn")
-    if lobby and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then L.Character.HumanoidRootPart.CFrame=lobby.CFrame+Vector3.new(0,5,0)end
+mkButton(WorldSF,t("TeleportLobby"),"[1]",5,Color3.fromRGB(60,100,200),function()
+    local lobby=workspace:FindFirstChild("Lobby")or workspace:FindFirstChild("Spawn")or workspace:FindFirstChild("LobbyArea")
+    if lobby and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then L.Character.HumanoidRootPart.CFrame=lobby.CFrame+Vector3.new(0,10,0)end
 end)
-mkButton(WorldSF,t("TeleportMap"),"🗺",52,Color3.fromRGB(60,100,200),function()
-    local map=workspace:FindFirstChild("Map")or workspace:FindFirstChild("Arena")
-    if map and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then L.Character.HumanoidRootPart.CFrame=map.CFrame+Vector3.new(0,5,0)end
+mkButton(WorldSF,t("TeleportMap"),"[2]",52,Color3.fromRGB(60,100,200),function()
+    local map=workspace:FindFirstChild("Map")or workspace:FindFirstChild("Arena")or workspace:FindFirstChild("GameArea")
+    if map and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then L.Character.HumanoidRootPart.CFrame=map.CFrame+Vector3.new(0,10,0)end
 end)
 WorldSF.CanvasSize=UDim2.new(0,0,0,100)
 
@@ -377,7 +383,7 @@ local LangFrame=Instance.new("Frame")LangFrame.Size=UDim2.new(1,-10,0,50)LangFra
 LangFrame.BackgroundColor3=Color3.fromRGB(25,25,45)LangFrame.BorderSizePixel=0 LangFrame.Parent=SettingsSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=LangFrame
 local LangLabel=Instance.new("TextLabel")LangLabel.Size=UDim2.new(1,0,0,20)LangLabel.Position=UDim2.new(0,5,0,5)
-LangLabel.BackgroundTransparency=1 LangLabel.Text="🌐 "..t("Language")LangLabel.TextColor3=Color3.fromRGB(200,220,255)
+LangLabel.BackgroundTransparency=1 LangLabel.Text="[?] "..t("Language")LangLabel.TextColor3=Color3.fromRGB(200,220,255)
 LangLabel.Font=Enum.Font.GothamBold LangLabel.TextSize=12 LangLabel.Parent=LangFrame
 local ENBtn=Instance.new("TextButton")ENBtn.Size=UDim2.new(.4,0,0,22)ENBtn.Position=UDim2.new(.05,0,0,26)
 ENBtn.BackgroundColor3=Color3.fromRGB(50,200,100)ENBtn.Text="EN"ENBtn.TextColor3=Color3.fromRGB(255,255,255)
@@ -387,23 +393,23 @@ local RUBtn=Instance.new("TextButton")RUBtn.Size=UDim2.new(.4,0,0,22)RUBtn.Posit
 RUBtn.BackgroundColor3=Color3.fromRGB(40,40,70)RUBtn.Text="RU"RUBtn.TextColor3=Color3.fromRGB(255,255,255)
 RUBtn.Font=Enum.Font.GothamBold RUBtn.TextSize=11 RUBtn.Parent=LangFrame
 Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=RUBtn
-ENBtn.MouseButton1Click:Connect(function()Lang="EN"T:Create(ENBtn,TweenInfo.new(.3),{BackgroundColor3=Color3.fromRGB(50,200,100)}):Play()T:Create(RUBtn,TweenInfo.new(.3),{BackgroundColor3=Color3.fromRGB(40,40,70)}):Play()TitleLabel.Text="🔷 "..t("Title")end)
-RUBtn.MouseButton1Click:Connect(function()Lang="RU"T:Create(RUBtn,TweenInfo.new(.3),{BackgroundColor3=Color3.fromRGB(50,200,100)}):Play()T:Create(ENBtn,TweenInfo.new(.3),{BackgroundColor3=Color3.fromRGB(40,40,70)}):Play()TitleLabel.Text="🔷 "..t("Title")end)
+ENBtn.MouseButton1Click:Connect(function()Lang="EN"T:Create(ENBtn,TweenInfo.new(.3),{BackgroundColor3=Color3.fromRGB(50,200,100)}):Play()T:Create(RUBtn,TweenInfo.new(.3),{BackgroundColor3=Color3.fromRGB(40,40,70)}):Play()TitleLabel.Text="[FIXED] "..t("Title")end)
+RUBtn.MouseButton1Click:Connect(function()Lang="RU"T:Create(RUBtn,TweenInfo.new(.3),{BackgroundColor3=Color3.fromRGB(50,200,100)}):Play()T:Create(ENBtn,TweenInfo.new(.3),{BackgroundColor3=Color3.fromRGB(40,40,70)}):Play()TitleLabel.Text="[FIXED] "..t("Title")end)
 
-mkToggle(SettingsSF,t("PhoneButtons"),"📱",60,"ShowPhoneButtons")
-mkToggle(SettingsSF,t("AutoFarm"),"💰",107,"AutoFarm")
+mkToggle(SettingsSF,t("PhoneButtons"),"[P]",60,"ShowPhoneButtons")
+mkToggle(SettingsSF,t("AutoFarm"),"[W]",107,"AutoFarm")
 mkSlider(SettingsSF,t("FarmSpeed"),158,1,10,1,"FarmSpeed")
-mkButton(SettingsSF,t("SaveConfig"),"💾",198,Color3.fromRGB(200,150,50),function()
+mkButton(SettingsSF,t("SaveConfig"),"[S]",198,Color3.fromRGB(200,150,50),function()
     if writefile then writefile("syphix_config.json",game:GetService("HttpService"):JSONEncode(S))Notify(t("ConfigSaved"))end
 end)
-mkButton(SettingsSF,t("LoadConfig"),"📂",245,Color3.fromRGB(200,150,50),function()
+mkButton(SettingsSF,t("LoadConfig"),"[L]",245,Color3.fromRGB(200,150,50),function()
     if readfile and isfile and isfile("syphix_config.json")then
         local data=game:GetService("HttpService"):JSONDecode(readfile("syphix_config.json"))
         for k,v in pairs(data)do S[k]=v end
         Notify(t("ConfigLoaded"))
     end
 end)
-mkButton(SettingsSF,t("Reset"),"🔄",292,Color3.fromRGB(200,60,60),function()Notify(t("ResetDone"))end)
+mkButton(SettingsSF,t("Reset"),"[R]",292,Color3.fromRGB(200,60,60),function()Notify(t("ResetDone"))end)
 SettingsSF.CanvasSize=UDim2.new(0,0,0,340)
 
 -- ============ PHONE BUTTONS ============
@@ -413,17 +419,17 @@ Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Par
 
 local function mkPBB(icon,pos,color,cb)
     local b=Instance.new("TextButton")b.Size=UDim2.new(1,-10,0,38)b.Position=UDim2.new(0,5,0,pos)
-    b.BackgroundColor3=color b.Text=icon b.TextColor3=Color3.fromRGB(255,255,255)b.Font=Enum.Font.GothamBold b.TextSize=16 b.Parent=PBF
+    b.BackgroundColor3=color b.Text=icon b.TextColor3=Color3.fromRGB(255,255,255)b.Font=Enum.Font.GothamBold b.TextSize=14 b.Parent=PBF
     Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=b
     b.MouseEnter:Connect(function()T:Create(b,TweenInfo.new(.2),{Size=UDim2.new(1,-10,0,42)}):Play()end)
     b.MouseLeave:Connect(function()T:Create(b,TweenInfo.new(.2),{Size=UDim2.new(1,-10,0,38)}):Play()end)
     b.MouseButton1Click:Connect(cb)
 end
 
-mkPBB("🔫",5,Color3.fromRGB(200,60,60),function()shootMurderer()end)
-mkPBB("🔫",47,Color3.fromRGB(60,100,200),function()takeGun()end)
-mkPBB("⏰",89,Color3.fromRGB(200,150,50),function()S.AntiAFK=true end)
-mkPBB("💰",131,Color3.fromRGB(50,200,100),function()S.AutoFarm=not S.AutoFarm end)
+mkPBB("[K]",5,Color3.fromRGB(200,60,60),function()shootMurderer()end)
+mkPBB("[G]",47,Color3.fromRGB(60,100,200),function()takeGun()end)
+mkPBB("[A]",89,Color3.fromRGB(200,150,50),function()S.AntiAFK=true end)
+mkPBB("[F]",131,Color3.fromRGB(50,200,100),function()S.AutoFarm=not S.AutoFarm end)
 
 -- ============ INIT ============
 TabFrames.Combat.Visible=true
@@ -437,16 +443,13 @@ local TracerLines={}
 local function getRole(role)
     for _,p in pairs(P:GetPlayers())do
         if p~=L and p.Character then
-            local rv=p.Character:FindFirstChild("Role")or p:FindFirstChild("Role")or p:FindFirstChild("Murderer")or p:FindFirstChild("Sheriff")
-            if rv then
-                if rv.Value==role or rv.Name==role then return p end
+            local bp=p:FindFirstChild("Backpack")
+            if bp then
+                if role=="Murderer"and bp:FindFirstChild("Knife")then return p end
+                if role=="Sheriff"and bp:FindFirstChild("Gun")then return p end
             end
-            -- Альтернативные проверки
-            local backpack=p:FindFirstChild("Backpack")
-            if backpack then
-                if role=="Murderer"and backpack:FindFirstChild("Knife")then return p end
-                if role=="Sheriff"and backpack:FindFirstChild("Gun")then return p end
-            end
+            if p.Character:FindFirstChild("Knife")and role=="Murderer"then return p end
+            if(p.Character:FindFirstChild("Gun")or p.Character:FindFirstChild("Pistol"))and role=="Sheriff"then return p end
         end
     end
     return nil
@@ -460,12 +463,11 @@ end
 local function takeGun()
     local sh=getRole("Sheriff")
     if sh and sh.Character then
-        local gun=sh.Character:FindFirstChild("Gun")or sh.Character:FindFirstChild("Pistol")or sh.Backpack and sh.Backpack:FindFirstChild("Gun")
+        local gun=sh.Character:FindFirstChild("Gun")or sh.Character:FindFirstChild("Pistol")
         if gun then gun.Parent=L.Backpack or L.Character end
     end
 end
 
--- Tracers
 local function CreateTracers()
     RemoveTracers()
     for _,p in pairs(P:GetPlayers())do
@@ -512,26 +514,21 @@ end)
 R.RenderStepped:Connect(function()
     PBF.Visible=S.ShowPhoneButtons
     
-    -- ESP (Persistent - не пропадает между раундами)
+    -- ESP (Persistent)
     if S.ESP or S.InnESP or S.MurESP or S.ShESP then
         for _,p in pairs(P:GetPlayers())do
             if p~=L and p.Character and p.Character:FindFirstChild("Head")then
                 local role="Innocent"
-                local rv=p.Character:FindFirstChild("Role")or p:FindFirstChild("Role")
-                if rv then role=rv.Value end
-                -- Проверка через Backpack
                 local bp=p:FindFirstChild("Backpack")
                 if bp then
                     if bp:FindFirstChild("Knife")then role="Murderer"end
                     if bp:FindFirstChild("Gun")then role="Sheriff"end
                 end
-                -- Проверка через предметы в руках
                 if p.Character:FindFirstChild("Knife")then role="Murderer"end
                 if p.Character:FindFirstChild("Gun")or p.Character:FindFirstChild("Pistol")then role="Sheriff"end
                 
                 local show=false local color=Color3.fromRGB(100,180,255)
                 if S.ESP then show=true;color=S.ESPColor end
-                if S.Rainbow then show=true;color=Color3.fromHSV(tick()%1,1,1)end
                 if role=="Innocent"and S.InnESP then show=true;color=Color3.fromRGB(0,255,100)end
                 if role=="Murderer"and S.MurESP then show=true;color=Color3.fromRGB(255,50,50)end
                 if role=="Sheriff"and S.ShESP then show=true;color=Color3.fromRGB(50,100,255)end
@@ -553,7 +550,7 @@ R.RenderStepped:Connect(function()
         for p,h in pairs(EspHighlights)do if h and h.Parent then h:Destroy()end EspHighlights[p]=nil end
     end
     
-    -- Chams (работающий)
+    -- Chams
     if S.Ch then
         for _,p in pairs(P:GetPlayers())do
             if p~=L and p.Character then
@@ -599,10 +596,14 @@ R.RenderStepped:Connect(function()
     if S.SP and L.Character and L.Character:FindFirstChild("Humanoid")then L.Character.Humanoid.WalkSpeed=16*S.SPMul
     elseif not S.SP and not S.BunnyHop and L.Character and L.Character:FindFirstChild("Humanoid")then L.Character.Humanoid.WalkSpeed=16 end
     
-    -- BunnyHop
+    -- BunnyHop (ручной - только при зажатии Space)
     if S.BunnyHop and L.Character and L.Character:FindFirstChild("Humanoid")then
         local hum=L.Character.Humanoid
-        if hum.FloorMaterial~=Enum.Material.Air then hum:ChangeState(Enum.HumanoidStateType.Jumping)hum.WalkSpeed=hum.WalkSpeed+3 BHopActive=true end
+        if U:IsKeyDown(Enum.KeyCode.Space)and hum.FloorMaterial~=Enum.Material.Air then
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+            hum.WalkSpeed=hum.WalkSpeed+3
+            BHopActive=true
+        end
     elseif BHopActive and L.Character and L.Character:FindFirstChild("Humanoid")then L.Character.Humanoid.WalkSpeed=16 BHopActive=false end
     
     -- Fly
@@ -651,11 +652,12 @@ R.RenderStepped:Connect(function()
     -- AntiAFK
     if S.AntiAFK then VU:Button2Down(Vector2.new(0,0),C.CFrame)task.wait(.1)VU:Button2Up(Vector2.new(0,0),C.CFrame)end
     
-    -- XRay
-    if S.XRay then for _,v in pairs(workspace:GetDescendants())do if v:IsA("BasePart")then v.LocalTransparencyModifier=.5 end end end
-    
-    -- Fullbright
-    if S.FB then Lighting.Brightness=2 Lighting.ClockTime=12 end
+    -- XRay (исправлено выключение)
+    if S.XRay then
+        for _,v in pairs(workspace:GetDescendants())do if v:IsA("BasePart")then v.LocalTransparencyModifier=.5 end end
+    else
+        for _,v in pairs(workspace:GetDescendants())do if v:IsA("BasePart")and v.LocalTransparencyModifier==.5 then v.LocalTransparencyModifier=0 end end
+    end
     
     -- AutoFarm
     if S.AutoFarm and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then L.Character.HumanoidRootPart.CFrame=L.Character.HumanoidRootPart.CFrame+Vector3.new(0,0,S.FarmSpeed)end
@@ -670,11 +672,13 @@ task.spawn(function()
     end
     T:Create(IntroBG,TweenInfo.new(.8),{BackgroundTransparency=0}):Play()
     task.wait(.2)
+    T:Create(FixedText,TweenInfo.new(.5,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{TextTransparency=0}):Play()
+    task.wait(.2)
     T:Create(LogoIcon,TweenInfo.new(.8,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{TextTransparency=0}):Play()
     task.wait(.3)
     T:Create(TitleText,TweenInfo.new(.8,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{TextTransparency=0}):Play()
     task.wait(.4)
-    T:Create(Line,TweenInfo.new(.8),{Size=UDim2.new(0,300,0,3),Position=UDim2.new(.5,-150,.5,50)}):Play()
+    T:Create(Line,TweenInfo.new(.8),{Size=UDim2.new(0,300,0,3),Position=UDim2.new(.5,-150,.5,60)}):Play()
     task.wait(.3)
     T:Create(BetaText,TweenInfo.new(.6),{TextTransparency=0}):Play()
     task.wait(.3)
@@ -683,9 +687,10 @@ task.spawn(function()
     T:Create(ProgF,TweenInfo.new(.3),{BackgroundTransparency=0}):Play()
     T:Create(ProgFill,TweenInfo.new(1),{Size=UDim2.new(1,0,1,0)}):Play()
     task.wait(1.2)
+    T:Create(FixedText,TweenInfo.new(.3),{TextTransparency=1}):Play()
     T:Create(LogoIcon,TweenInfo.new(.4),{TextTransparency=1,Position=UDim2.new(.5,-50,.5,-200)}):Play()
     T:Create(TitleText,TweenInfo.new(.4),{TextTransparency=1}):Play()
-    T:Create(Line,TweenInfo.new(.4),{Size=UDim2.new(0,0,0,3),Position=UDim2.new(.5,0,.5,50)}):Play()
+    T:Create(Line,TweenInfo.new(.4),{Size=UDim2.new(0,0,0,3),Position=UDim2.new(.5,0,.5,60)}):Play()
     T:Create(BetaText,TweenInfo.new(.3),{TextTransparency=1}):Play()
     T:Create(VerText,TweenInfo.new(.3),{TextTransparency=1}):Play()
     T:Create(ProgF,TweenInfo.new(.3),{BackgroundTransparency=1}):Play()
@@ -696,7 +701,6 @@ task.spawn(function()
     T:Create(M,TweenInfo.new(.7,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{BackgroundTransparency=0,Position=UDim2.new(.5,-260,.5,-230)}):Play()
 end)
 
--- Пульсация логотипа
 task.spawn(function()
     task.wait(3.5)
     while M.Parent do
@@ -707,4 +711,4 @@ task.spawn(function()
     end
 end)
 
-Notify("🔷 Syphixman v28 "..t("Loaded"))
+Notify("[FIXED] Syphixman v30 "..t("Loaded"))
