@@ -1,4 +1,4 @@
--- SYPHIX HUB | v11 | MM2 Collapsible Bar
+-- SYPHIX HUB | v14 | Fling Tab + Grab Gun
 local P,R,U,T,C,L=game:GetService("Players"),game:GetService("RunService"),game:GetService("UserInputService"),game:GetService("TweenService"),workspace.CurrentCamera,game:GetService("Players").LocalPlayer
 local VU=game:GetService("VirtualUser")
 
@@ -24,17 +24,15 @@ local ESP_Enabled=false
 local ESP_Murderer=false
 local ESP_Sheriff=false
 local ESP_Innocent=false
-
 local Boxes_Enabled=false
 local Boxes_Murderer=false
 local Boxes_Sheriff=false
 local Boxes_Innocent=false
-
 local Aimbot_Enabled=false
 local KillAll_Enabled=false
+local GrabGun_Enabled=false
 local Whitelist={}
 local HideKey="LeftAlt"
-
 local EspHighlights={}
 local EspBoxes={}
 
@@ -104,7 +102,6 @@ LauncherTitle.Text="SYPHIX HUB"
 LauncherTitle.TextColor3=Color3.fromRGB(255,255,255)
 LauncherTitle.Font=Enum.Font.GothamBlack
 LauncherTitle.TextSize=16
-LauncherTitle.TextXAlignment=Enum.TextXAlignment.Left
 LauncherTitle.Parent=LauncherHeader
 
 local LauncherContent=Instance.new("ScrollingFrame")
@@ -115,7 +112,6 @@ LauncherContent.BorderSizePixel=0
 LauncherContent.ScrollBarThickness=3
 LauncherContent.Parent=LauncherMenu
 
--- Карточка MM2
 local MM2Card=Instance.new("TextButton")
 MM2Card.Size=UDim2.new(1,0,0,45)
 MM2Card.Position=UDim2.new(0,0,0,5)
@@ -166,8 +162,8 @@ Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Pare
 
 LauncherContent.CanvasSize=UDim2.new(0,0,0,60)
 
--- ============ MM2 BAR ============
-local MG=Instance.new("ScreenGui")MG.Name="MM2Bar"MG.Parent=GetHui()
+-- ============ MM2 ============
+local MG=Instance.new("ScreenGui")MG.Name="MM2"MG.Parent=GetHui()
 MG.Enabled=false
 
 local MM2Bar=Instance.new("Frame")
@@ -199,7 +195,6 @@ MM2BarArrow.TextSize=12
 MM2BarArrow.Parent=MM2Bar
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=MM2BarArrow
 
--- ============ MM2 PANEL ============
 local MM2Panel=Instance.new("Frame")
 MM2Panel.Size=UDim2.new(0,0,0,0)
 MM2Panel.Position=UDim2.new(.5,-262,.5,-262)
@@ -226,7 +221,6 @@ MM2Title.Text="SYPHIX MM2"
 MM2Title.TextColor3=Color3.fromRGB(255,100,100)
 MM2Title.Font=Enum.Font.GothamBlack
 MM2Title.TextSize=15
-MM2Title.TextXAlignment=Enum.TextXAlignment.Left
 MM2Title.Parent=MM2Header
 
 local MM2CloseBtn=Instance.new("TextButton")
@@ -279,15 +273,12 @@ for i=1,4 do
         b.TextSize=11
         b.Parent=MM2Tabs
         Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
-        
         b.MouseButton1Click:Connect(function()
             for n,btn in pairs(MM2TabButtons)do
                 btn.BackgroundColor3=n==name and Color3.fromRGB(60,100,200)or Color3.fromRGB(20,20,38)
                 btn.TextColor3=n==name and Color3.fromRGB(255,255,255)or Color3.fromRGB(120,140,180)
             end
-            for n,f in pairs(MM2TabFrames)do
-                f.Visible=n==name
-            end
+            for n,f in pairs(MM2TabFrames)do f.Visible=n==name end
         end)
         MM2TabButtons[name]=b
     end)
@@ -296,82 +287,75 @@ end
 -- ============ COMBAT ============
 local CombatSF=MM2TabFrames.Combat
 
-local function mkToggleWithSub(parent,name,y,subContent,subHeight)
-    pcall(function()
-        local mainFrame=Instance.new("Frame")
-        mainFrame.Size=UDim2.new(1,-10,0,40)
-        mainFrame.Position=UDim2.new(0,5,0,y)
-        mainFrame.BackgroundColor3=Color3.fromRGB(20,20,38)
-        mainFrame.BorderSizePixel=0
-        mainFrame.Parent=parent
-        Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=mainFrame
-        
-        local label=Instance.new("TextLabel")
-        label.Size=UDim2.new(.55,0,1,0)
-        label.Position=UDim2.new(0,10,0,0)
-        label.BackgroundTransparency=1
-        label.Text=name
-        label.TextColor3=Color3.fromRGB(200,220,255)
-        label.Font=Enum.Font.Gotham
-        label.TextSize=12
-        label.Parent=mainFrame
-        
-        local toggle=Instance.new("TextButton")
-        toggle.Size=UDim2.new(0,55,0,25)
-        toggle.Position=UDim2.new(1,-100,0,7)
-        toggle.BackgroundColor3=Color3.fromRGB(40,40,70)
-        toggle.Text="OFF"
-        toggle.TextColor3=Color3.fromRGB(150,170,200)
-        toggle.Font=Enum.Font.GothamBold
-        toggle.TextSize=9
-        toggle.Parent=mainFrame
-        Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=toggle
-        
-        local expand=Instance.new("TextButton")
-        expand.Size=UDim2.new(0,25,0,25)
-        expand.Position=UDim2.new(1,-35,0,7)
-        expand.BackgroundColor3=Color3.fromRGB(60,100,200)
-        expand.Text=">"
-        expand.TextColor3=Color3.fromRGB(255,255,255)
-        expand.Font=Enum.Font.GothamBold
-        expand.TextSize=12
-        expand.Parent=mainFrame
-        Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=expand
-        
-        local submenu=Instance.new("Frame")
-        submenu.Size=UDim2.new(1,-10,0,0)
-        submenu.Position=UDim2.new(0,5,0,y+43)
-        submenu.BackgroundColor3=Color3.fromRGB(25,25,45)
-        submenu.BorderSizePixel=0
-        submenu.ClipsDescendants=true
-        submenu.Parent=parent
-        Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=submenu
-        
-        if subContent then
-            subContent(submenu)
+local function mkToggleWithSub(parent,name,y,subContent,subHeight,onToggle)
+    local mainFrame=Instance.new("Frame")
+    mainFrame.Size=UDim2.new(1,-10,0,40)
+    mainFrame.Position=UDim2.new(0,5,0,y)
+    mainFrame.BackgroundColor3=Color3.fromRGB(20,20,38)
+    mainFrame.BorderSizePixel=0
+    mainFrame.Parent=parent
+    Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=mainFrame
+    
+    local label=Instance.new("TextLabel")
+    label.Size=UDim2.new(.55,0,1,0)
+    label.Position=UDim2.new(0,10,0,0)
+    label.BackgroundTransparency=1
+    label.Text=name
+    label.TextColor3=Color3.fromRGB(200,220,255)
+    label.Font=Enum.Font.Gotham
+    label.TextSize=12
+    label.Parent=mainFrame
+    
+    local toggle=Instance.new("TextButton")
+    toggle.Size=UDim2.new(0,55,0,25)
+    toggle.Position=UDim2.new(1,-100,0,7)
+    toggle.BackgroundColor3=Color3.fromRGB(40,40,70)
+    toggle.Text="OFF"
+    toggle.TextColor3=Color3.fromRGB(150,170,200)
+    toggle.Font=Enum.Font.GothamBold
+    toggle.TextSize=9
+    toggle.Parent=mainFrame
+    Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=toggle
+    
+    local expand=Instance.new("TextButton")
+    expand.Size=UDim2.new(0,25,0,25)
+    expand.Position=UDim2.new(1,-35,0,7)
+    expand.BackgroundColor3=Color3.fromRGB(60,100,200)
+    expand.Text=">"
+    expand.TextColor3=Color3.fromRGB(255,255,255)
+    expand.Font=Enum.Font.GothamBold
+    expand.TextSize=12
+    expand.Parent=mainFrame
+    Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=expand
+    
+    local submenu=Instance.new("Frame")
+    submenu.Size=UDim2.new(1,-10,0,0)
+    submenu.Position=UDim2.new(0,5,0,y+43)
+    submenu.BackgroundColor3=Color3.fromRGB(25,25,45)
+    submenu.BorderSizePixel=0
+    submenu.ClipsDescendants=true
+    submenu.Parent=parent
+    Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=submenu
+    
+    if subContent then subContent(submenu)end
+    
+    local isOpen=false
+    expand.MouseButton1Click:Connect(function()
+        isOpen=not isOpen
+        if isOpen then
+            T:Create(submenu,TweenInfo.new(.4,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{Size=UDim2.new(1,-10,0,subHeight or 100)}):Play()
+            expand.Text="v"
+        else
+            T:Create(submenu,TweenInfo.new(.3,Enum.EasingStyle.Quad,Enum.EasingDirection.In),{Size=UDim2.new(1,-10,0,0)}):Play()
+            expand.Text=">"
         end
-        
-        local isOpen=false
-        expand.MouseButton1Click:Connect(function()
-            isOpen=not isOpen
-            if isOpen then
-                T:Create(submenu,TweenInfo.new(.4,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{Size=UDim2.new(1,-10,0,subHeight or 100)}):Play()
-                expand.Text="v"
-            else
-                T:Create(submenu,TweenInfo.new(.3,Enum.EasingStyle.Quad,Enum.EasingDirection.In),{Size=UDim2.new(1,-10,0,0)}):Play()
-                expand.Text=">"
-            end
-        end)
-        
-        toggle.MouseButton1Click:Connect(function()
-            local state=not (toggle.Text=="ON")
-            toggle.BackgroundColor3=state and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
-            toggle.Text=state and"ON"or"OFF"
-            if name=="Aimbot"then Aimbot_Enabled=state end
-            if name=="Kill All"then KillAll_Enabled=state end
-        end)
-        
-        return toggle,submenu
+    end)
+    
+    toggle.MouseButton1Click:Connect(function()
+        local state=not(toggle.Text=="ON")
+        toggle.BackgroundColor3=state and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
+        toggle.Text=state and"ON"or"OFF"
+        if onToggle then onToggle(state)end
     end)
 end
 
@@ -386,9 +370,9 @@ mkToggleWithSub(CombatSF,"Aimbot",5,function(sub)
     info.Font=Enum.Font.Gotham
     info.TextSize=11
     info.Parent=sub
-end,80)
+end,80,function(state)Aimbot_Enabled=state end)
 
--- Kill All с белым списком
+-- Kill All
 mkToggleWithSub(CombatSF,"Kill All",130,function(sub)
     local wl=Instance.new("ScrollingFrame")
     wl.Size=UDim2.new(1,-10,0,200)
@@ -426,117 +410,269 @@ mkToggleWithSub(CombatSF,"Kill All",130,function(sub)
         end)
     end
     refreshWL()
-end,240)
+end,240,function(state)KillAll_Enabled=state end)
 
-CombatSF.CanvasSize=UDim2.new(0,0,0,400)
+-- Grab Gun (без подменю)
+local GrabGunFrame=Instance.new("Frame")
+GrabGunFrame.Size=UDim2.new(1,-10,0,40)
+GrabGunFrame.Position=UDim2.new(0,5,0,400)
+GrabGunFrame.BackgroundColor3=Color3.fromRGB(20,20,38)
+GrabGunFrame.BorderSizePixel=0
+GrabGunFrame.Parent=CombatSF
+Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=GrabGunFrame
+
+local GrabGunLabel=Instance.new("TextLabel")
+GrabGunLabel.Size=UDim2.new(.55,0,1,0)
+GrabGunLabel.Position=UDim2.new(0,10,0,0)
+GrabGunLabel.BackgroundTransparency=1
+GrabGunLabel.Text="Grab Gun"
+GrabGunLabel.TextColor3=Color3.fromRGB(200,220,255)
+GrabGunLabel.Font=Enum.Font.Gotham
+GrabGunLabel.TextSize=12
+GrabGunLabel.Parent=GrabGunFrame
+
+local GrabGunToggle=Instance.new("TextButton")
+GrabGunToggle.Size=UDim2.new(0,55,0,25)
+GrabGunToggle.Position=UDim2.new(1,-60,0,7)
+GrabGunToggle.BackgroundColor3=Color3.fromRGB(40,40,70)
+GrabGunToggle.Text="OFF"
+GrabGunToggle.TextColor3=Color3.fromRGB(150,170,200)
+GrabGunToggle.Font=Enum.Font.GothamBold
+GrabGunToggle.TextSize=9
+GrabGunToggle.Parent=GrabGunFrame
+Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=GrabGunToggle
+
+GrabGunToggle.MouseButton1Click:Connect(function()
+    GrabGun_Enabled=not GrabGun_Enabled
+    GrabGunToggle.BackgroundColor3=GrabGun_Enabled and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
+    GrabGunToggle.Text=GrabGun_Enabled and"ON"or"OFF"
+    if GrabGun_Enabled then
+        -- Забрать пистолет у шерифа
+        pcall(function()
+            for _,p in pairs(P:GetPlayers())do
+                if p~=L then
+                    local char=p.Character
+                    if char then
+                        local gun=char:FindFirstChild("Gun")or char:FindFirstChild("Pistol")
+                        if gun then
+                            gun.Parent=L.Backpack or L.Character
+                            Notify("Gun grabbed!")
+                            break
+                        end
+                    end
+                    local bp=p:FindFirstChild("Backpack")
+                    if bp then
+                        local gun2=bp:FindFirstChild("Gun")or bp:FindFirstChild("Pistol")
+                        if gun2 then
+                            gun2.Parent=L.Backpack or L.Character
+                            Notify("Gun grabbed!")
+                            break
+                        end
+                    end
+                end
+            end
+        end)
+        task.wait(.5)
+        GrabGun_Enabled=false
+        GrabGunToggle.BackgroundColor3=Color3.fromRGB(40,40,70)
+        GrabGunToggle.Text="OFF"
+    end
+end)
+
+CombatSF.CanvasSize=UDim2.new(0,0,0,450)
 
 -- ============ VISUAL ============
 local VisualSF=MM2TabFrames.Visual
 
--- ESP
-local ESPToggle,ESPSub=mkToggleWithSub(VisualSF,"ESP",5,function(sub)
-    local function mkRoleToggle(name,y,stateVar)
-        pcall(function()
-            local f=Instance.new("Frame")
-            f.Size=UDim2.new(1,-10,0,30)
-            f.Position=UDim2.new(0,5,0,y)
-            f.BackgroundColor3=Color3.fromRGB(30,30,50)
-            f.BorderSizePixel=0
-            f.Parent=sub
-            Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=f
-            
-            local l=Instance.new("TextLabel")
-            l.Size=UDim2.new(.6,0,1,0)
-            l.Position=UDim2.new(0,7,0,0)
-            l.BackgroundTransparency=1
-            l.Text=name
-            l.TextColor3=Color3.fromRGB(200,220,255)
-            l.Font=Enum.Font.Gotham
-            l.TextSize=10
-            l.Parent=f
-            
-            local b=Instance.new("TextButton")
-            b.Size=UDim2.new(0,45,0,20)
-            b.Position=UDim2.new(1,-50,0,5)
-            b.BackgroundColor3=Color3.fromRGB(40,40,70)
-            b.Text="OFF"
-            b.TextColor3=Color3.fromRGB(150,170,200)
-            b.Font=Enum.Font.GothamBold
-            b.TextSize=9
-            b.Parent=f
-            Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
-            
-            b.MouseButton1Click:Connect(function()
-                local st=not(b.Text=="ON")
-                b.BackgroundColor3=st and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
-                b.Text=st and"ON"or"OFF"
-                if name=="Murderer"then ESP_Murderer=st end
-                if name=="Sheriff"then ESP_Sheriff=st end
-                if name=="Innocent"then ESP_Innocent=st end
-            end)
+mkToggleWithSub(VisualSF,"ESP",5,function(sub)
+    local function mkRole(name,y,setter)
+        local f=Instance.new("Frame")
+        f.Size=UDim2.new(1,-10,0,30)
+        f.Position=UDim2.new(0,5,0,y)
+        f.BackgroundColor3=Color3.fromRGB(30,30,50)
+        f.BorderSizePixel=0
+        f.Parent=sub
+        Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=f
+        local l=Instance.new("TextLabel")
+        l.Size=UDim2.new(.6,0,1,0)
+        l.Position=UDim2.new(0,7,0,0)
+        l.BackgroundTransparency=1
+        l.Text=name
+        l.TextColor3=Color3.fromRGB(200,220,255)
+        l.Font=Enum.Font.Gotham
+        l.TextSize=10
+        l.Parent=f
+        local b=Instance.new("TextButton")
+        b.Size=UDim2.new(0,45,0,20)
+        b.Position=UDim2.new(1,-50,0,5)
+        b.BackgroundColor3=Color3.fromRGB(40,40,70)
+        b.Text="OFF"
+        b.TextColor3=Color3.fromRGB(150,170,200)
+        b.Font=Enum.Font.GothamBold
+        b.TextSize=9
+        b.Parent=f
+        Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
+        b.MouseButton1Click:Connect(function()
+            local st=not(b.Text=="ON")
+            b.BackgroundColor3=st and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
+            b.Text=st and"ON"or"OFF"
+            setter(st)
         end)
     end
-    
-    mkRoleToggle("Murderer",5,"ESP_Murderer")
-    mkRoleToggle("Sheriff",38,"ESP_Sheriff")
-    mkRoleToggle("Innocent",71,"ESP_Innocent")
-end,110)
+    mkRole("Murderer (Red)",5,function(st)ESP_Murderer=st end)
+    mkRole("Sheriff (Blue)",38,function(st)ESP_Sheriff=st end)
+    mkRole("Innocent (Green)",71,function(st)ESP_Innocent=st end)
+end,110,function(state)ESP_Enabled=state end)
 
--- Boxes
-local BoxToggle,BoxSub=mkToggleWithSub(VisualSF,"Boxes",130,function(sub)
-    local function mkRoleToggle2(name,y,stateVar)
-        pcall(function()
-            local f=Instance.new("Frame")
-            f.Size=UDim2.new(1,-10,0,30)
-            f.Position=UDim2.new(0,5,0,y)
-            f.BackgroundColor3=Color3.fromRGB(30,30,50)
-            f.BorderSizePixel=0
-            f.Parent=sub
-            Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=f
-            
-            local l=Instance.new("TextLabel")
-            l.Size=UDim2.new(.6,0,1,0)
-            l.Position=UDim2.new(0,7,0,0)
-            l.BackgroundTransparency=1
-            l.Text=name
-            l.TextColor3=Color3.fromRGB(200,220,255)
-            l.Font=Enum.Font.Gotham
-            l.TextSize=10
-            l.Parent=f
-            
-            local b=Instance.new("TextButton")
-            b.Size=UDim2.new(0,45,0,20)
-            b.Position=UDim2.new(1,-50,0,5)
-            b.BackgroundColor3=Color3.fromRGB(40,40,70)
-            b.Text="OFF"
-            b.TextColor3=Color3.fromRGB(150,170,200)
-            b.Font=Enum.Font.GothamBold
-            b.TextSize=9
-            b.Parent=f
-            Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
-            
-            b.MouseButton1Click:Connect(function()
-                local st=not(b.Text=="ON")
-                b.BackgroundColor3=st and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
-                b.Text=st and"ON"or"OFF"
-                if name=="Murderer"then Boxes_Murderer=st end
-                if name=="Sheriff"then Boxes_Sheriff=st end
-                if name=="Innocent"then Boxes_Innocent=st end
-            end)
+mkToggleWithSub(VisualSF,"Boxes",130,function(sub)
+    local function mkRole2(name,y,setter)
+        local f=Instance.new("Frame")
+        f.Size=UDim2.new(1,-10,0,30)
+        f.Position=UDim2.new(0,5,0,y)
+        f.BackgroundColor3=Color3.fromRGB(30,30,50)
+        f.BorderSizePixel=0
+        f.Parent=sub
+        Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=f
+        local l=Instance.new("TextLabel")
+        l.Size=UDim2.new(.6,0,1,0)
+        l.Position=UDim2.new(0,7,0,0)
+        l.BackgroundTransparency=1
+        l.Text=name
+        l.TextColor3=Color3.fromRGB(200,220,255)
+        l.Font=Enum.Font.Gotham
+        l.TextSize=10
+        l.Parent=f
+        local b=Instance.new("TextButton")
+        b.Size=UDim2.new(0,45,0,20)
+        b.Position=UDim2.new(1,-50,0,5)
+        b.BackgroundColor3=Color3.fromRGB(40,40,70)
+        b.Text="OFF"
+        b.TextColor3=Color3.fromRGB(150,170,200)
+        b.Font=Enum.Font.GothamBold
+        b.TextSize=9
+        b.Parent=f
+        Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
+        b.MouseButton1Click:Connect(function()
+            local st=not(b.Text=="ON")
+            b.BackgroundColor3=st and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
+            b.Text=st and"ON"or"OFF"
+            setter(st)
         end)
     end
-    
-    mkRoleToggle2("Murderer",5,"Boxes_Murderer")
-    mkRoleToggle2("Sheriff",38,"Boxes_Sheriff")
-    mkRoleToggle2("Innocent",71,"Boxes_Innocent")
-end,110)
+    mkRole2("Murderer (Red)",5,function(st)Boxes_Murderer=st end)
+    mkRole2("Sheriff (Blue)",38,function(st)Boxes_Sheriff=st end)
+    mkRole2("Innocent (Green)",71,function(st)Boxes_Innocent=st end)
+end,110,function(state)Boxes_Enabled=state end)
 
 VisualSF.CanvasSize=UDim2.new(0,0,0,300)
+
+-- ============ FLING ============
+local FlingSF=MM2TabFrames.Fling
+
+-- Список игроков
+local FlingPlayerList=Instance.new("ScrollingFrame")
+FlingPlayerList.Size=UDim2.new(1,-10,0,280)
+FlingPlayerList.Position=UDim2.new(0,5,0,5)
+FlingPlayerList.BackgroundColor3=Color3.fromRGB(18,18,30)
+FlingPlayerList.BorderSizePixel=0
+FlingPlayerList.Parent=FlingSF
+Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=FlingPlayerList
+
+local function FlingTarget(p)
+    pcall(function()
+        if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")then
+            local hrp=p.Character.HumanoidRootPart
+            hrp.CFrame=hrp.CFrame+Vector3.new(0,50,0)
+            hrp.Velocity=Vector3.new(math.random(-8000,8000),12000,math.random(-8000,8000))
+            hrp.RotVelocity=Vector3.new(math.random(-600,600),math.random(-600,600),math.random(-600,600))
+            task.delay(1,function()
+                pcall(function()
+                    if p.Character and p.Character:FindFirstChild("HumanoidRootPart")then
+                        p.Character.HumanoidRootPart.CFrame=CFrame.new(0,-1000,0)
+                    end
+                end)
+            end)
+            Notify("Flinged "..p.Name)
+        end
+    end)
+end
+
+local function RefreshFlingList()
+    pcall(function()
+        for _,c in pairs(FlingPlayerList:GetChildren())do if c:IsA("TextButton")then c:Destroy()end end
+        local y=0
+        for _,p in pairs(P:GetPlayers())do
+            if p~=L then
+                local b=Instance.new("TextButton")
+                b.Size=UDim2.new(1,-10,0,30)
+                b.Position=UDim2.new(0,5,0,y)
+                b.BackgroundColor3=Color3.fromRGB(30,30,50)
+                b.Text=p.Name
+                b.TextColor3=Color3.fromRGB(200,220,255)
+                b.Font=Enum.Font.GothamBold
+                b.TextSize=10
+                b.Parent=FlingPlayerList
+                Instance.new("UICorner").CornerRadius=UDim.new(0,5)Instance.new("UICorner").Parent=b
+                b.MouseButton1Click:Connect(function()FlingTarget(p)end)
+                y+=35
+            end
+        end
+        FlingPlayerList.CanvasSize=UDim2.new(0,0,0,y)
+    end)
+end
+RefreshFlingList()
+
+-- Кнопка Murderer за карту
+local FlingMurdererBtn=Instance.new("TextButton")
+FlingMurdererBtn.Size=UDim2.new(1,-10,0,40)
+FlingMurdererBtn.Position=UDim2.new(0,5,0,295)
+FlingMurdererBtn.BackgroundColor3=Color3.fromRGB(255,80,80)
+FlingMurdererBtn.Text="FLING MURDERER"
+FlingMurdererBtn.TextColor3=Color3.fromRGB(255,255,255)
+FlingMurdererBtn.Font=Enum.Font.GothamBlack
+FlingMurdererBtn.TextSize=12
+FlingMurdererBtn.Parent=FlingSF
+Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=FlingMurdererBtn
+
+FlingMurdererBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        for _,p in pairs(P:GetPlayers())do
+            if p~=L and getRole(p)=="Murderer"then
+                FlingTarget(p)
+                break
+            end
+        end
+    end)
+end)
+
+-- Кнопка Sheriff за карту
+local FlingSheriffBtn=Instance.new("TextButton")
+FlingSheriffBtn.Size=UDim2.new(1,-10,0,40)
+FlingSheriffBtn.Position=UDim2.new(0,5,0,340)
+FlingSheriffBtn.BackgroundColor3=Color3.fromRGB(60,100,200)
+FlingSheriffBtn.Text="FLING SHERIFF"
+FlingSheriffBtn.TextColor3=Color3.fromRGB(255,255,255)
+FlingSheriffBtn.Font=Enum.Font.GothamBlack
+FlingSheriffBtn.TextSize=12
+FlingSheriffBtn.Parent=FlingSF
+Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=FlingSheriffBtn
+
+FlingSheriffBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        for _,p in pairs(P:GetPlayers())do
+            if p~=L and getRole(p)=="Sheriff"then
+                FlingTarget(p)
+                break
+            end
+        end
+    end)
+end)
+
+FlingSF.CanvasSize=UDim2.new(0,0,0,390)
 
 -- ============ OTHERS ============
 local OthersSF=MM2TabFrames.Others
 
--- Hide Key
 local HideFrame=Instance.new("Frame")
 HideFrame.Size=UDim2.new(1,-10,0,60)
 HideFrame.Position=UDim2.new(0,5,0,5)
@@ -570,7 +706,6 @@ local listeningForKeys=false
 ChangeKeyBtn.MouseButton1Click:Connect(function()
     listeningForKeys=true
     ChangeKeyBtn.Text="PRESS ANY KEY..."
-    Notify("Press any key...")
 end)
 
 U.InputBegan:Connect(function(input,gameProcessed)
@@ -580,7 +715,6 @@ U.InputBegan:Connect(function(input,gameProcessed)
             HideLabel.Text="Hide Key: "..HideKey
             ChangeKeyBtn.Text="CHANGE KEY"
             listeningForKeys=false
-            Notify("Key set to: "..HideKey)
         end
     end
 end)
@@ -592,140 +726,8 @@ MM2TabFrames.Combat.Visible=true
 MM2TabButtons.Combat.BackgroundColor3=Color3.fromRGB(60,100,200)
 MM2TabButtons.Combat.TextColor3=Color3.fromRGB(255,255,255)
 
--- ============ ФУНКЦИИ ============
-function OpenMM2Panel()
-    MM2Panel.Visible=true
-    MM2Panel.Size=UDim2.new(0,0,0,0)
-    MM2Panel.BackgroundTransparency=1
-    T:Create(MM2Panel,TweenInfo.new(.6,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{
-        Size=UDim2.new(0,524,0,524),
-        BackgroundTransparency=0,
-        Position=UDim2.new(.5,-262,.5,-262)
-    }):Play()
-end
-
-function CloseMM2Panel()
-    T:Create(MM2Panel,TweenInfo.new(.3),{Size=UDim2.new(0,0,0,0),BackgroundTransparency=1,Position=UDim2.new(.5,0,.5,0)}):Play()
-    task.wait(.3)
-    MM2Panel.Visible=false
-end
-
-MM2CloseBtn.MouseButton1Click:Connect(CloseMM2Panel)
-
--- MM2 Bar Toggle
-local mm2PanelOpen=false
-local function ToggleMM2Panel()
-    mm2PanelOpen=not mm2PanelOpen
-    if mm2PanelOpen then
-        OpenMM2Panel()
-        MM2BarArrow.Text="<"
-    else
-        CloseMM2Panel()
-        MM2BarArrow.Text=">"
-    end
-end
-
-MM2BarArrow.MouseButton1Click:Connect(ToggleMM2Panel)
-MM2BarText.InputBegan:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 then
-        ToggleMM2Panel()
-    end
-end)
-
--- Hide key
-U.InputBegan:Connect(function(input,gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode==Enum.KeyCode[HideKey]then
-        MM2Panel.Visible=not MM2Panel.Visible
-        MM2Bar.Visible=not MM2Bar.Visible
-    end
-end)
-
--- Перетаскивание MM2 Bar
-local mm2Dragging=false
-local mm2Start=nil
-local mm2Pos=nil
-MM2Bar.InputBegan:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 then
-        mm2Dragging=true
-        mm2Start=i.Position
-        mm2Pos=MM2Bar.Position
-    end
-end)
-U.InputEnded:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 then
-        mm2Dragging=false
-    end
-end)
-U.InputChanged:Connect(function(i)
-    if mm2Dragging and i.UserInputType==Enum.UserInputType.MouseMovement then
-        local d=i.Position-mm2Start
-        MM2Bar.Position=UDim2.new(mm2Pos.X.Scale,mm2Pos.X.Offset+d.X,mm2Pos.Y.Scale,mm2Pos.Y.Offset+d.Y)
-    end
-end)
-
--- ============ LAUNCHER ЛОГИКА ============
-MM2Execute.MouseButton1Click:Connect(function()
-    -- Закрываем лаунчер
-    T:Create(LauncherMenu,TweenInfo.new(.3),{Size=UDim2.new(0,0,0,0),BackgroundTransparency=1}):Play()
-    task.wait(.3)
-    LauncherMenu.Visible=false
-    LG:Destroy()
-    
-    -- Показываем MM2 Bar
-    MG.Enabled=true
-    Notify("SYPHIX MM2 loaded! Click bar to open")
-end)
-
--- Лаунчер открытие
-local launcherOpen=false
-local function ToggleLauncher()
-    launcherOpen=not launcherOpen
-    if launcherOpen then
-        LauncherMenu.Visible=true
-        LauncherMenu.Size=UDim2.new(0,0,0,0)
-        T:Create(LauncherMenu,TweenInfo.new(.5,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Size=UDim2.new(0,300,0,130),BackgroundTransparency=0}):Play()
-        TopBarArrow.Text="^"
-    else
-        T:Create(LauncherMenu,TweenInfo.new(.3),{Size=UDim2.new(0,0,0,0),BackgroundTransparency=1}):Play()
-        TopBarArrow.Text="v"
-        task.wait(.3)
-        LauncherMenu.Visible=false
-    end
-end
-
-TopBarArrow.MouseButton1Click:Connect(ToggleLauncher)
-TopBarText.InputBegan:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 then
-        ToggleLauncher()
-    end
-end)
-
--- Перетаскивание TopBar
-local draggingBar=false
-local barStart=nil
-local barPos=nil
-TopBar.InputBegan:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 then
-        draggingBar=true
-        barStart=i.Position
-        barPos=TopBar.Position
-    end
-end)
-U.InputEnded:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 then
-        draggingBar=false
-    end
-end)
-U.InputChanged:Connect(function(i)
-    if draggingBar and i.UserInputType==Enum.UserInputType.MouseMovement then
-        local d=i.Position-barStart
-        TopBar.Position=UDim2.new(barPos.X.Scale,barPos.X.Offset+d.X,barPos.Y.Scale,barPos.Y.Offset+d.Y)
-    end
-end)
-
--- ============ РОЛИ ============
-local function getRole(p)
+-- ============ ROLES ============
+function getRole(p)
     if p.Character then
         for _,child in pairs(p.Character:GetChildren())do
             if child:IsA("Tool")then
@@ -748,17 +750,17 @@ local function getRole(p)
     return"Innocent"
 end
 
--- ESP/Boxes логика
+-- ============ LOGIC ============
 R.RenderStepped:Connect(function()
     pcall(function()
-        -- ESP
+        -- ESP (Persistent - не пропадает)
         if ESP_Enabled or ESP_Murderer or ESP_Sheriff or ESP_Innocent then
             for _,p in pairs(P:GetPlayers())do
                 if p~=L and p.Character and p.Character:FindFirstChild("Head")then
                     local role=getRole(p)
                     local show=false
                     local color=Color3.fromRGB(0,255,100)
-                    if ESP_Enabled then show=true end
+                    if ESP_Enabled then show=true;color=Color3.fromRGB(100,180,255)end
                     if role=="Murderer"and ESP_Murderer then show=true;color=Color3.fromRGB(255,50,50)end
                     if role=="Sheriff"and ESP_Sheriff then show=true;color=Color3.fromRGB(50,100,255)end
                     if role=="Innocent"and ESP_Innocent then show=true;color=Color3.fromRGB(0,255,100)end
@@ -773,6 +775,7 @@ R.RenderStepped:Connect(function()
                             EspHighlights[p]=existing
                         else
                             existing.FillColor=color
+                            if not existing.Parent then existing.Parent=p.Character end
                         end
                     elseif EspHighlights[p]and EspHighlights[p].Parent then
                         EspHighlights[p]:Destroy()
@@ -785,14 +788,14 @@ R.RenderStepped:Connect(function()
             EspHighlights={}
         end
         
-        -- Boxes (2D прямоугольники)
+        -- Boxes (Persistent)
         if Boxes_Enabled or Boxes_Murderer or Boxes_Sheriff or Boxes_Innocent then
             for _,p in pairs(P:GetPlayers())do
-                if p~=L and p.Character and p.Character:FindFirstChild("Head")and p.Character:FindFirstChild("HumanoidRootPart")then
+                if p~=L and p.Character and p.Character:FindFirstChild("Head")then
                     local role=getRole(p)
                     local show=false
                     local color=Color3.fromRGB(0,255,100)
-                    if Boxes_Enabled then show=true end
+                    if Boxes_Enabled then show=true;color=Color3.fromRGB(100,180,255)end
                     if role=="Murderer"and Boxes_Murderer then show=true;color=Color3.fromRGB(255,50,50)end
                     if role=="Sheriff"and Boxes_Sheriff then show=true;color=Color3.fromRGB(50,100,255)end
                     if role=="Innocent"and Boxes_Innocent then show=true;color=Color3.fromRGB(0,255,100)end
@@ -800,15 +803,17 @@ R.RenderStepped:Connect(function()
                     if show then
                         local existing=EspBoxes[p]
                         if not existing or not existing.Parent then
-                            local box=Instance.new("SelectionBox")
-                            box.Color3=color
-                            box.LineThickness=0.05
-                            box.Transparency=0.5
-                            box.Adornee=p.Character
+                            local box=Instance.new("Highlight")
+                            box.FillColor=color
+                            box.OutlineColor=color
+                            box.FillTransparency=0.7
+                            box.OutlineTransparency=0
                             box.Parent=p.Character
                             EspBoxes[p]=box
                         else
-                            existing.Color3=color
+                            existing.FillColor=color
+                            existing.OutlineColor=color
+                            if not existing.Parent then existing.Parent=p.Character end
                         end
                     elseif EspBoxes[p]and EspBoxes[p].Parent then
                         EspBoxes[p]:Destroy()
@@ -845,6 +850,154 @@ R.RenderStepped:Connect(function()
             end
         end
     end)
+end)
+
+-- ============ PANEL DRAG ============
+local panelDragging=false
+local panelStart=nil
+local panelPos=nil
+MM2Header.InputBegan:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then
+        panelDragging=true
+        panelStart=i.Position
+        panelPos=MM2Panel.Position
+    end
+end)
+U.InputEnded:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then
+        panelDragging=false
+    end
+end)
+U.InputChanged:Connect(function(i)
+    if panelDragging and i.UserInputType==Enum.UserInputType.MouseMovement then
+        local d=i.Position-panelStart
+        MM2Panel.Position=UDim2.new(panelPos.X.Scale,panelPos.X.Offset+d.X,panelPos.Y.Scale,panelPos.Y.Offset+d.Y)
+    end
+end)
+
+-- ============ OPEN/CLOSE ============
+function OpenMM2Panel()
+    MM2Panel.Visible=true
+    MM2Panel.Size=UDim2.new(0,0,0,0)
+    MM2Panel.BackgroundTransparency=1
+    T:Create(MM2Panel,TweenInfo.new(.6,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{
+        Size=UDim2.new(0,524,0,524),
+        BackgroundTransparency=0
+    }):Play()
+end
+
+function CloseMM2Panel()
+    T:Create(MM2Panel,TweenInfo.new(.3),{Size=UDim2.new(0,0,0,0),BackgroundTransparency=1}):Play()
+    task.wait(.3)
+    MM2Panel.Visible=false
+end
+
+MM2CloseBtn.MouseButton1Click:Connect(CloseMM2Panel)
+
+local mm2PanelOpen=false
+local function ToggleMM2Panel()
+    mm2PanelOpen=not mm2PanelOpen
+    if mm2PanelOpen then
+        OpenMM2Panel()
+        MM2BarArrow.Text="<"
+    else
+        CloseMM2Panel()
+        MM2BarArrow.Text=">"
+    end
+end
+
+MM2BarArrow.MouseButton1Click:Connect(ToggleMM2Panel)
+MM2BarText.InputBegan:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then
+        ToggleMM2Panel()
+    end
+end)
+
+U.InputBegan:Connect(function(input,gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode==Enum.KeyCode[HideKey]then
+        MM2Bar.Visible=not MM2Bar.Visible
+        if MM2Panel.Visible then MM2Panel.Visible=false end
+    end
+end)
+
+-- MM2 Bar drag
+local barDragging=false
+local barStartPos=nil
+local barOrigPos=nil
+MM2Bar.InputBegan:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then
+        barDragging=true
+        barStartPos=i.Position
+        barOrigPos=MM2Bar.Position
+    end
+end)
+U.InputEnded:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then
+        barDragging=false
+    end
+end)
+U.InputChanged:Connect(function(i)
+    if barDragging and i.UserInputType==Enum.UserInputType.MouseMovement then
+        local d=i.Position-barStartPos
+        MM2Bar.Position=UDim2.new(barOrigPos.X.Scale,barOrigPos.X.Offset+d.X,barOrigPos.Y.Scale,barOrigPos.Y.Offset+d.Y)
+    end
+end)
+
+-- Launcher
+MM2Execute.MouseButton1Click:Connect(function()
+    T:Create(LauncherMenu,TweenInfo.new(.3),{Size=UDim2.new(0,0,0,0),BackgroundTransparency=1}):Play()
+    task.wait(.3)
+    LauncherMenu.Visible=false
+    LG:Destroy()
+    MG.Enabled=true
+    Notify("SYPHIX MM2 loaded!")
+end)
+
+local launcherOpen=false
+local function ToggleLauncher()
+    launcherOpen=not launcherOpen
+    if launcherOpen then
+        LauncherMenu.Visible=true
+        LauncherMenu.Size=UDim2.new(0,0,0,0)
+        T:Create(LauncherMenu,TweenInfo.new(.5,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Size=UDim2.new(0,300,0,130),BackgroundTransparency=0}):Play()
+        TopBarArrow.Text="^"
+    else
+        T:Create(LauncherMenu,TweenInfo.new(.3),{Size=UDim2.new(0,0,0,0),BackgroundTransparency=1}):Play()
+        TopBarArrow.Text="v"
+        task.wait(.3)
+        LauncherMenu.Visible=false
+    end
+end
+
+TopBarArrow.MouseButton1Click:Connect(ToggleLauncher)
+TopBarText.InputBegan:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then
+        ToggleLauncher()
+    end
+end)
+
+-- TopBar drag
+local topDragging=false
+local topStart=nil
+local topPos=nil
+TopBar.InputBegan:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then
+        topDragging=true
+        topStart=i.Position
+        topPos=TopBar.Position
+    end
+end)
+U.InputEnded:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then
+        topDragging=false
+    end
+end)
+U.InputChanged:Connect(function(i)
+    if topDragging and i.UserInputType==Enum.UserInputType.MouseMovement then
+        local d=i.Position-topStart
+        TopBar.Position=UDim2.new(topPos.X.Scale,topPos.X.Offset+d.X,topPos.Y.Scale,topPos.Y.Offset+d.Y)
+    end
 end)
 
 Notify("SYPHIX HUB loaded!")
