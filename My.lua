@@ -1,14 +1,36 @@
--- Syphixman MM2 v35 | All Fixed + Intro + Expand GUI + Player List Fling
+-- Syphixman MM2 v36 | Fixed Launch
 local P,R,U,T,C,L=game:GetService("Players"),game:GetService("RunService"),game:GetService("UserInputService"),game:GetService("TweenService"),workspace.CurrentCamera,game:GetService("Players").LocalPlayer
 local VU=game:GetService("VirtualUser")
-local Lighting=game:GetService("Lighting")
 
 local function GetHui()
-    if gethui then return gethui()
-    elseif syn and syn.protect_gui then return game.CoreGui
-    elseif get_hidden_gui then return get_hidden_gui()
-    else return game.CoreGui end
+    pcall(function()
+        if gethui then return gethui() end
+    end)
+    pcall(function()
+        if syn and syn.protect_gui then return game.CoreGui end
+    end)
+    pcall(function()
+        if get_hidden_gui then return get_hidden_gui() end
+    end)
+    return game.CoreGui
 end
+
+local S={
+    Aim=false,AimRadius=500,
+    Fl=false,FlPower=15,
+    Fly=false,FlySpeed=50,
+    NC=false,SP=false,SPMul=2,GM=false,
+    KA=false,KARadius=30,KADamage=100,
+    ESP=false,ESPColor=Color3.fromRGB(100,180,255),
+    InnESP=false,MurESP=false,ShESP=false,
+    Tr=false,Ch=false,XRay=false,
+    InfJump=false,NoFall=false,AntiAFK=false,Reach=false,ReachDist=20,
+    AutoFarm=false,FarmSpeed=1,
+    Spin=false,SpinSpeed=10,
+    BunnyHop=false,AntiFling=false,
+    SelectedPlayer=nil,
+    GUIScale=1
+}
 
 local function Notify(text)
     pcall(function()
@@ -30,47 +52,16 @@ local function Notify(text)
     end)
 end
 
-local S={
-    Aim=false,AimRadius=500,
-    Fl=false,FlPower=15,
-    Fly=false,FlySpeed=50,
-    NC=false,SP=false,SPMul=2,GM=false,
-    KA=false,KARadius=30,KADamage=100,
-    ESP=false,ESPColor=Color3.fromRGB(100,180,255),
-    InnESP=false,MurESP=false,ShESP=false,
-    Tr=false,Ch=false,XRay=false,
-    InfJump=false,NoFall=false,AntiAFK=false,Reach=false,ReachDist=20,
-    AutoFarm=false,FarmSpeed=1,
-    Spin=false,SpinSpeed=10,
-    BunnyHop=false,AntiFling=false,
-    ShowPhoneButtons=false,
-    SelectedPlayer=nil,
-    GUIScale=1
-}
-
 -- ============ INTRO ============
-local Intro=Instance.new("ScreenGui")Intro.Name="Intro"Intro.Parent=GetHui()
+local Intro=Instance.new("ScreenGui")
+Intro.Name="Intro"
+Intro.Parent=GetHui()
 
 local IntroBG=Instance.new("Frame")
 IntroBG.Size=UDim2.new(1,0,1,0)
 IntroBG.BackgroundColor3=Color3.fromRGB(5,5,15)
 IntroBG.BackgroundTransparency=1
 IntroBG.Parent=Intro
-
-local Stars={}
-for i=1,40 do
-    pcall(function()
-        local s=Instance.new("Frame")
-        s.Size=UDim2.new(0,math.random(2,4),0,math.random(2,4))
-        s.Position=UDim2.new(math.random(),0,math.random(),0)
-        s.BackgroundColor3=Color3.fromRGB(100,180,255)
-        s.BackgroundTransparency=0.5
-        s.BorderSizePixel=0
-        s.Parent=Intro
-        Instance.new("UICorner").CornerRadius=UDim.new(1,0)Instance.new("UICorner").Parent=s
-        Stars[#Stars+1]=s
-    end)
-end
 
 local FixedText=Instance.new("TextLabel")
 FixedText.Size=UDim2.new(0,300,0,40)
@@ -117,7 +108,7 @@ local VerText=Instance.new("TextLabel")
 VerText.Size=UDim2.new(0,300,0,25)
 VerText.Position=UDim2.new(.5,-150,.5,95)
 VerText.BackgroundTransparency=1
-VerText.Text="v35.0 | by Ryzen"
+VerText.Text="v36.0 | by Ryzen"
 VerText.TextColor3=Color3.fromRGB(100,100,150)
 VerText.Font=Enum.Font.Gotham
 VerText.TextSize=14
@@ -141,7 +132,9 @@ ProgFill.Parent=ProgF
 Instance.new("UICorner").CornerRadius=UDim.new(1,0)Instance.new("UICorner").Parent=ProgFill
 
 -- ============ MAIN GUI ============
-local G=Instance.new("ScreenGui")G.Name="Syphix"G.Parent=GetHui()
+local G=Instance.new("ScreenGui")
+G.Name="Syphix"
+G.Parent=GetHui()
 G.Enabled=false
 
 local M=Instance.new("Frame")
@@ -153,78 +146,158 @@ M.BackgroundTransparency=1
 M.Parent=G
 Instance.new("UICorner").CornerRadius=UDim.new(0,14)Instance.new("UICorner").Parent=M
 
-local TB=Instance.new("Frame")TB.Size=UDim2.new(1,0,0,40)TB.BackgroundColor3=Color3.fromRGB(20,20,40)TB.BorderSizePixel=0 TB.Parent=M
+local TB=Instance.new("Frame")
+TB.Size=UDim2.new(1,0,0,40)
+TB.BackgroundColor3=Color3.fromRGB(20,20,40)
+TB.BorderSizePixel=0
+TB.Parent=M
 Instance.new("UICorner").CornerRadius=UDim.new(0,14)Instance.new("UICorner").Parent=TB
-local TBb=Instance.new("Frame")TBb.Size=UDim2.new(1,0,0,20)TBb.Position=UDim2.new(0,0,0,20)TBb.BackgroundColor3=Color3.fromRGB(20,20,40)TBb.BorderSizePixel=0 TBb.Parent=TB
 
-local Title=Instance.new("TextLabel")Title.Size=UDim2.new(0,160,0,25)Title.Position=UDim2.new(0,15,0,8)
-Title.BackgroundTransparency=1 Title.Text="[FIXED] SYPHIX"Title.TextColor3=Color3.fromRGB(200,220,255)
-Title.Font=Enum.Font.GothamBlack Title.TextSize=14 Title.Parent=TB
+local TBb=Instance.new("Frame")
+TBb.Size=UDim2.new(1,0,0,20)
+TBb.Position=UDim2.new(0,0,0,20)
+TBb.BackgroundColor3=Color3.fromRGB(20,20,40)
+TBb.BorderSizePixel=0
+TBb.Parent=TB
 
--- Кнопка скрытия
-local HideBtn=Instance.new("TextButton")HideBtn.Size=UDim2.new(0,24,0,24)HideBtn.Position=UDim2.new(1,-60,0,8)
-HideBtn.BackgroundColor3=Color3.fromRGB(200,150,50)HideBtn.Text="-"HideBtn.TextColor3=Color3.fromRGB(255,255,255)
-HideBtn.Font=Enum.Font.GothamBold HideBtn.TextSize=14 HideBtn.Parent=TB
-Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=HideBtn
+local Title=Instance.new("TextLabel")
+Title.Size=UDim2.new(0,140,0,25)
+Title.Position=UDim2.new(0,15,0,8)
+Title.BackgroundTransparency=1
+Title.Text="SYPHIX MM2"
+Title.TextColor3=Color3.fromRGB(200,220,255)
+Title.Font=Enum.Font.GothamBlack
+Title.TextSize=13
+Title.Parent=TB
+
+local HideBtn=Instance.new("TextButton")
+HideBtn.Size=UDim2.new(0,22,0,22)
+HideBtn.Position=UDim2.new(1,-56,0,9)
+HideBtn.BackgroundColor3=Color3.fromRGB(200,150,50)
+HideBtn.Text="-"
+HideBtn.TextColor3=Color3.fromRGB(255,255,255)
+HideBtn.Font=Enum.Font.GothamBold
+HideBtn.TextSize=14
+HideBtn.Parent=TB
+Instance.new("UICorner").CornerRadius=UDim.new(0,5)Instance.new("UICorner").Parent=HideBtn
 HideBtn.MouseButton1Click:Connect(function()
     M.Visible=false
-    Notify("Hidden! Press LeftAlt to show")
 end)
 
--- Кнопка расширения
-local ExpandBtn=Instance.new("TextButton")ExpandBtn.Size=UDim2.new(0,24,0,24)ExpandBtn.Position=UDim2.new(1,-88,0,8)
-ExpandBtn.BackgroundColor3=Color3.fromRGB(60,100,200)ExpandBtn.Text="+"ExpandBtn.TextColor3=Color3.fromRGB(255,255,255)
-ExpandBtn.Font=Enum.Font.GothamBold ExpandBtn.TextSize=14 ExpandBtn.Parent=TB
-Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=ExpandBtn
+local ExpandBtn=Instance.new("TextButton")
+ExpandBtn.Size=UDim2.new(0,22,0,22)
+ExpandBtn.Position=UDim2.new(1,-80,0,9)
+ExpandBtn.BackgroundColor3=Color3.fromRGB(60,100,200)
+ExpandBtn.Text="+"
+ExpandBtn.TextColor3=Color3.fromRGB(255,255,255)
+ExpandBtn.Font=Enum.Font.GothamBold
+ExpandBtn.TextSize=14
+ExpandBtn.Parent=TB
+Instance.new("UICorner").CornerRadius=UDim.new(0,5)Instance.new("UICorner").Parent=ExpandBtn
 ExpandBtn.MouseButton1Click:Connect(function()
-    S.GUIScale=S.GUIScale+0.2
-    if S.GUIScale>1.5 then S.GUIScale=1.5 end
+    S.GUIScale=math.min(S.GUIScale+0.2,1.5)
     M.Size=UDim2.new(0,math.floor(450*S.GUIScale),0,math.floor(480*S.GUIScale))
 end)
 
--- Кнопка уменьшения
-local ShrinkBtn=Instance.new("TextButton")ShrinkBtn.Size=UDim2.new(0,24,0,24)ShrinkBtn.Position=UDim2.new(1,-116,0,8)
-ShrinkBtn.BackgroundColor3=Color3.fromRGB(200,60,60)ShrinkBtn.Text="--"ShrinkBtn.TextColor3=Color3.fromRGB(255,255,255)
-ShrinkBtn.Font=Enum.Font.GothamBold ShrinkBtn.TextSize=12 ShrinkBtn.Parent=TB
-Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=ShrinkBtn
+local ShrinkBtn=Instance.new("TextButton")
+ShrinkBtn.Size=UDim2.new(0,22,0,22)
+ShrinkBtn.Position=UDim2.new(1,-104,0,9)
+ShrinkBtn.BackgroundColor3=Color3.fromRGB(200,60,60)
+ShrinkBtn.Text="--"
+ShrinkBtn.TextColor3=Color3.fromRGB(255,255,255)
+ShrinkBtn.Font=Enum.Font.GothamBold
+ShrinkBtn.TextSize=10
+ShrinkBtn.Parent=TB
+Instance.new("UICorner").CornerRadius=UDim.new(0,5)Instance.new("UICorner").Parent=ShrinkBtn
 ShrinkBtn.MouseButton1Click:Connect(function()
-    S.GUIScale=S.GUIScale-0.2
-    if S.GUIScale<0.7 then S.GUIScale=0.7 end
+    S.GUIScale=math.max(S.GUIScale-0.2,0.7)
     M.Size=UDim2.new(0,math.floor(450*S.GUIScale),0,math.floor(480*S.GUIScale))
 end)
 
-local CB=Instance.new("TextButton")CB.Size=UDim2.new(0,24,0,24)CB.Position=UDim2.new(1,-30,0,8)
-CB.BackgroundColor3=Color3.fromRGB(255,80,80)CB.Text="X"CB.TextColor3=Color3.fromRGB(255,255,255)
-CB.Font=Enum.Font.GothamBold CB.TextSize=12 CB.Parent=TB
-Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=CB
-CB.MouseButton1Click:Connect(function()G:Destroy()end)
+local CB=Instance.new("TextButton")
+CB.Size=UDim2.new(0,22,0,22)
+CB.Position=UDim2.new(1,-26,0,9)
+CB.BackgroundColor3=Color3.fromRGB(255,80,80)
+CB.Text="X"
+CB.TextColor3=Color3.fromRGB(255,255,255)
+CB.Font=Enum.Font.GothamBold
+CB.TextSize=11
+CB.Parent=TB
+Instance.new("UICorner").CornerRadius=UDim.new(0,5)Instance.new("UICorner").Parent=CB
+CB.MouseButton1Click:Connect(function()
+    pcall(function()G:Destroy()end)
+end)
 
--- Drag
-local dragging=false local ds=nil local sp=nil
-TB.InputBegan:Connect(function(i)if i.UserInputType==Enum.UserInputType.MouseButton1 then dragging=true ds=i.Position sp=M.Position end end)
-U.InputEnded:Connect(function(i)if i.UserInputType==Enum.UserInputType.MouseButton1 then dragging=false end end)
-U.InputChanged:Connect(function(i)if dragging and i.UserInputType==Enum.UserInputType.MouseMovement then local d=i.Position-ds M.Position=UDim2.new(sp.X.Scale,sp.X.Offset+d.X,sp.Y.Scale,sp.Y.Offset+d.Y)end end)
+local dragging=false
+local ds=nil
+local sp=nil
+TB.InputBegan:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then
+        dragging=true
+        ds=i.Position
+        sp=M.Position
+    end
+end)
+U.InputEnded:Connect(function(i)
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then
+        dragging=false
+    end
+end)
+U.InputChanged:Connect(function(i)
+    if dragging and i.UserInputType==Enum.UserInputType.MouseMovement then
+        local d=i.Position-ds
+        M.Position=UDim2.new(sp.X.Scale,sp.X.Offset+d.X,sp.Y.Scale,sp.Y.Offset+d.Y)
+    end
+end)
 
-local LP=Instance.new("Frame")LP.Size=UDim2.new(0,90,1,-40)LP.Position=UDim2.new(0,0,0,40)LP.BackgroundColor3=Color3.fromRGB(20,20,40)LP.BorderSizePixel=0 LP.Parent=M
-local CA=Instance.new("Frame")CA.Size=UDim2.new(1,-100,1,-55)CA.Position=UDim2.new(0,95,0,55)CA.BackgroundTransparency=1 CA.Parent=M
+local LP=Instance.new("Frame")
+LP.Size=UDim2.new(0,90,1,-40)
+LP.Position=UDim2.new(0,0,0,40)
+LP.BackgroundColor3=Color3.fromRGB(20,20,40)
+LP.BorderSizePixel=0
+LP.Parent=M
 
-local TabFrames={}local Tabs={}
+local CA=Instance.new("Frame")
+CA.Size=UDim2.new(1,-100,1,-55)
+CA.Position=UDim2.new(0,95,0,55)
+CA.BackgroundTransparency=1
+CA.Parent=M
+
+local TabFrames={}
+local Tabs={}
 local TabNames={"Combat","Visual","Fling","World","Settings"}
 local TabLabels={"[=] Combat","[o] Visual","[!] Fling","[@] World","[#] Settings"}
 
-for i,name in pairs(TabNames)do
+for i=1,5 do
+    local name=TabNames[i]
     pcall(function()
-        local SF=Instance.new("ScrollingFrame")SF.Size=UDim2.new(1,0,1,0)SF.BackgroundTransparency=1 SF.BorderSizePixel=0
-        SF.ScrollBarThickness=2 SF.ScrollBarImageColor3=Color3.fromRGB(80,140,255)SF.Visible=false SF.Parent=CA
+        local SF=Instance.new("ScrollingFrame")
+        SF.Size=UDim2.new(1,0,1,0)
+        SF.BackgroundTransparency=1
+        SF.BorderSizePixel=0
+        SF.ScrollBarThickness=2
+        SF.Visible=false
+        SF.Parent=CA
         TabFrames[name]=SF
         
-        local b=Instance.new("TextButton")b.Size=UDim2.new(1,-8,0,45)b.Position=UDim2.new(0,4,0,4+(i-1)*49)
-        b.BackgroundColor3=Color3.fromRGB(25,25,45)b.Text=TabLabels[i]b.TextColor3=Color3.fromRGB(120,140,180)
-        b.Font=Enum.Font.GothamBold b.TextSize=10 b.Parent=LP
+        local b=Instance.new("TextButton")
+        b.Size=UDim2.new(1,-8,0,45)
+        b.Position=UDim2.new(0,4,0,4+(i-1)*49)
+        b.BackgroundColor3=Color3.fromRGB(25,25,45)
+        b.Text=TabLabels[i]
+        b.TextColor3=Color3.fromRGB(120,140,180)
+        b.Font=Enum.Font.GothamBold
+        b.TextSize=10
+        b.Parent=LP
         Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=b
         b.MouseButton1Click:Connect(function()
-            for n,btn in pairs(Tabs)do btn.BackgroundColor3=n==name and Color3.fromRGB(60,100,200)or Color3.fromRGB(25,25,45)btn.TextColor3=n==name and Color3.fromRGB(255,255,255)or Color3.fromRGB(120,140,180)end
-            for n,f in pairs(TabFrames)do f.Visible=n==name end
+            for n,btn in pairs(Tabs)do
+                btn.BackgroundColor3=n==name and Color3.fromRGB(60,100,200)or Color3.fromRGB(25,25,45)
+                btn.TextColor3=n==name and Color3.fromRGB(255,255,255)or Color3.fromRGB(120,140,180)
+            end
+            for n,f in pairs(TabFrames)do
+                f.Visible=n==name
+            end
         end)
         Tabs[name]=b
     end)
@@ -232,16 +305,35 @@ end
 
 local function mkToggle(parent,name,y,set)
     pcall(function()
-        local f=Instance.new("Frame")f.Size=UDim2.new(1,-8,0,38)f.Position=UDim2.new(0,4,0,y)
-        f.BackgroundColor3=Color3.fromRGB(25,25,45)f.BorderSizePixel=0 f.Parent=parent
+        local f=Instance.new("Frame")
+        f.Size=UDim2.new(1,-8,0,36)
+        f.Position=UDim2.new(0,4,0,y)
+        f.BackgroundColor3=Color3.fromRGB(25,25,45)
+        f.BorderSizePixel=0
+        f.Parent=parent
         Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=f
-        local l=Instance.new("TextLabel")l.Size=UDim2.new(.55,0,1,0)l.Position=UDim2.new(0,10,0,0)
-        l.BackgroundTransparency=1 l.Text=name l.TextColor3=Color3.fromRGB(200,220,255)
-        l.Font=Enum.Font.Gotham l.TextSize=12 l.Parent=f
-        local btn=Instance.new("TextButton")btn.Size=UDim2.new(0,55,0,24)btn.Position=UDim2.new(1,-60,0,7)
-        btn.BackgroundColor3=Color3.fromRGB(40,40,70)btn.Text="OFF"btn.TextColor3=Color3.fromRGB(150,170,200)
-        btn.Font=Enum.Font.GothamBold btn.TextSize=10 btn.Parent=f
-        Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=btn
+        
+        local l=Instance.new("TextLabel")
+        l.Size=UDim2.new(.55,0,1,0)
+        l.Position=UDim2.new(0,9,0,0)
+        l.BackgroundTransparency=1
+        l.Text=name
+        l.TextColor3=Color3.fromRGB(200,220,255)
+        l.Font=Enum.Font.Gotham
+        l.TextSize=12
+        l.Parent=f
+        
+        local btn=Instance.new("TextButton")
+        btn.Size=UDim2.new(0,50,0,22)
+        btn.Position=UDim2.new(1,-55,0,7)
+        btn.BackgroundColor3=Color3.fromRGB(40,40,70)
+        btn.Text="OFF"
+        btn.TextColor3=Color3.fromRGB(150,170,200)
+        btn.Font=Enum.Font.GothamBold
+        btn.TextSize=10
+        btn.Parent=f
+        Instance.new("UICorner").CornerRadius=UDim.new(0,11)Instance.new("UICorner").Parent=btn
+        
         btn.MouseButton1Click:Connect(function()
             pcall(function()
                 S[set]=not S[set]
@@ -254,80 +346,131 @@ end
 
 local function mkSlider(parent,name,y,min,max,def,set)
     pcall(function()
-        local f=Instance.new("Frame")f.Size=UDim2.new(1,-8,0,32)f.Position=UDim2.new(0,4,0,y)
-        f.BackgroundColor3=Color3.fromRGB(25,25,45)f.BorderSizePixel=0 f.Parent=parent
+        local f=Instance.new("Frame")
+        f.Size=UDim2.new(1,-8,0,30)
+        f.Position=UDim2.new(0,4,0,y)
+        f.BackgroundColor3=Color3.fromRGB(25,25,45)
+        f.BorderSizePixel=0
+        f.Parent=parent
         Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=f
-        local l=Instance.new("TextLabel")l.Size=UDim2.new(.4,0,1,0)l.Position=UDim2.new(0,7,0,0)
-        l.BackgroundTransparency=1 l.Text=name l.TextColor3=Color3.fromRGB(150,170,200)
-        l.Font=Enum.Font.Gotham l.TextSize=10 l.Parent=f
-        local vl=Instance.new("TextLabel")vl.Size=UDim2.new(0,40,1,0)vl.Position=UDim2.new(1,-43,0,0)
-        vl.BackgroundTransparency=1 vl.Text=tostring(def)vl.TextColor3=Color3.fromRGB(100,180,255)
-        vl.Font=Enum.Font.GothamBold vl.TextSize=10 vl.Parent=f
-        local sb=Instance.new("TextButton")sb.Size=UDim2.new(.35,0,0,6)sb.Position=UDim2.new(.38,0,0,13)
-        sb.BackgroundColor3=Color3.fromRGB(40,40,70)sb.Text=""sb.BorderSizePixel=0 sb.Parent=f
-        Instance.new("UICorner").CornerRadius=UDim.new(1,0)Instance.new("UICorner").Parent=sb
-        local fill=Instance.new("Frame")fill.Size=UDim2.new((def-min)/(max-min),0,1,0)fill.BackgroundColor3=Color3.fromRGB(80,140,255)fill.BorderSizePixel=0 fill.Parent=sb
-        local knob=Instance.new("Frame")knob.Size=UDim2.new(0,12,0,12)knob.Position=UDim2.new((def-min)/(max-min),-6,0,-3)knob.BackgroundColor3=Color3.fromRGB(255,255,255)knob.BorderSizePixel=0 knob.Parent=sb
-        Instance.new("UICorner").CornerRadius=UDim.new(1,0)Instance.new("UICorner").Parent=knob
+        
+        local l=Instance.new("TextLabel")
+        l.Size=UDim2.new(.4,0,1,0)
+        l.Position=UDim2.new(0,6,0,0)
+        l.BackgroundTransparency=1
+        l.Text=name
+        l.TextColor3=Color3.fromRGB(150,170,200)
+        l.Font=Enum.Font.Gotham
+        l.TextSize=10
+        l.Parent=f
+        
+        local vl=Instance.new("TextLabel")
+        vl.Size=UDim2.new(0,40,1,0)
+        vl.Position=UDim2.new(1,-43,0,0)
+        vl.BackgroundTransparency=1
+        vl.Text=tostring(def)
+        vl.TextColor3=Color3.fromRGB(100,180,255)
+        vl.Font=Enum.Font.GothamBold
+        vl.TextSize=10
+        vl.Parent=f
+        
+        local sb=Instance.new("TextButton")
+        sb.Size=UDim2.new(.35,0,0,6)
+        sb.Position=UDim2.new(.38,0,0,12)
+        sb.BackgroundColor3=Color3.fromRGB(40,40,70)
+        sb.Text=""
+        sb.BorderSizePixel=0
+        sb.Parent=f
+        
+        local fill=Instance.new("Frame")
+        fill.Size=UDim2.new((def-min)/(max-min),0,1,0)
+        fill.BackgroundColor3=Color3.fromRGB(80,140,255)
+        fill.BorderSizePixel=0
+        fill.Parent=sb
+        
+        local knob=Instance.new("Frame")
+        knob.Size=UDim2.new(0,12,0,12)
+        knob.Position=UDim2.new((def-min)/(max-min),-6,0,-3)
+        knob.BackgroundColor3=Color3.fromRGB(255,255,255)
+        knob.BorderSizePixel=0
+        knob.Parent=sb
+        
         sb.MouseButton1Down:Connect(function()
-            local con con=R.RenderStepped:Connect(function()
+            local con
+            con=R.RenderStepped:Connect(function()
                 pcall(function()
                     if U:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)then
                         local rel=math.clamp((U:GetMouseLocation().X-sb.AbsolutePosition.X)/sb.AbsoluteSize.X,0,1)
-                        local val=math.floor(min+(max-min)*rel)S[set]=val vl.Text=tostring(val)
-                        fill.Size=UDim2.new(rel,0,1,0)knob.Position=UDim2.new(rel,-6,0,-3)
-                    else con:Disconnect()end
+                        local val=math.floor(min+(max-min)*rel)
+                        S[set]=val
+                        vl.Text=tostring(val)
+                        fill.Size=UDim2.new(rel,0,1,0)
+                        knob.Position=UDim2.new(rel,-6,0,-3)
+                    else
+                        con:Disconnect()
+                    end
                 end)
             end)
         end)
     end)
 end
 
--- ============ FILL ============
+-- ============ FILL TABS ============
 local CombatSF=TabFrames.Combat
 mkToggle(CombatSF,"Aimbot",5,"Aim")
-mkToggle(CombatSF,"Fling All",47,"Fl")
-mkToggle(CombatSF,"Fly",89,"Fly")
-mkToggle(CombatSF,"Noclip",131,"NC")
-mkToggle(CombatSF,"Speed Hack",173,"SP")
-mkToggle(CombatSF,"God Mode",215,"GM")
-mkToggle(CombatSF,"Kill Aura",257,"KA")
-mkToggle(CombatSF,"Reach",299,"Reach")
-mkToggle(CombatSF,"Spin",341,"Spin")
-mkToggle(CombatSF,"Bunny Hop",383,"BunnyHop")
-mkToggle(CombatSF,"Anti-Fling",425,"AntiFling")
-mkSlider(CombatSF,"Aim Radius",472,100,2000,500,"AimRadius")
-mkSlider(CombatSF,"Fling Power",508,1,50,15,"FlPower")
-mkSlider(CombatSF,"Reach Dist",544,5,50,20,"ReachDist")
-mkSlider(CombatSF,"Speed Mul",580,1,10,2,"SPMul")
-mkSlider(CombatSF,"Spin Speed",616,1,50,10,"SpinSpeed")
-CombatSF.CanvasSize=UDim2.new(0,0,0,660)
+mkToggle(CombatSF,"Fling All",45,"Fl")
+mkToggle(CombatSF,"Fly",85,"Fly")
+mkToggle(CombatSF,"Noclip",125,"NC")
+mkToggle(CombatSF,"Speed Hack",165,"SP")
+mkToggle(CombatSF,"God Mode",205,"GM")
+mkToggle(CombatSF,"Kill Aura",245,"KA")
+mkToggle(CombatSF,"Reach",285,"Reach")
+mkToggle(CombatSF,"Spin",325,"Spin")
+mkToggle(CombatSF,"Bunny Hop",365,"BunnyHop")
+mkToggle(CombatSF,"Anti-Fling",405,"AntiFling")
+mkSlider(CombatSF,"Aim Radius",450,100,2000,500,"AimRadius")
+mkSlider(CombatSF,"Fling Power",485,1,50,15,"FlPower")
+mkSlider(CombatSF,"Reach Dist",520,5,50,20,"ReachDist")
+mkSlider(CombatSF,"Speed Mul",555,1,10,2,"SPMul")
+mkSlider(CombatSF,"Spin Speed",590,1,50,10,"SpinSpeed")
+CombatSF.CanvasSize=UDim2.new(0,0,0,630)
 
 local VisualSF=TabFrames.Visual
 mkToggle(VisualSF,"ESP",5,"ESP")
-mkToggle(VisualSF,"Innocent ESP",47,"InnESP")
-mkToggle(VisualSF,"Murderer ESP",89,"MurESP")
-mkToggle(VisualSF,"Sheriff ESP",131,"ShESP")
-mkToggle(VisualSF,"Tracers",173,"Tr")
-mkToggle(VisualSF,"Chams",215,"Ch")
-mkToggle(VisualSF,"X-Ray",257,"XRay")
-VisualSF.CanvasSize=UDim2.new(0,0,0,300)
+mkToggle(VisualSF,"Innocent ESP",45,"InnESP")
+mkToggle(VisualSF,"Murderer ESP",85,"MurESP")
+mkToggle(VisualSF,"Sheriff ESP",125,"ShESP")
+mkToggle(VisualSF,"Tracers",165,"Tr")
+mkToggle(VisualSF,"Chams",205,"Ch")
+mkToggle(VisualSF,"X-Ray",245,"XRay")
+VisualSF.CanvasSize=UDim2.new(0,0,0,290)
 
--- Fling вкладка
 local FlingSF=TabFrames.Fling
-local PlayerList=Instance.new("ScrollingFrame")PlayerList.Size=UDim2.new(1,-8,0,350)PlayerList.Position=UDim2.new(0,4,0,5)
-PlayerList.BackgroundColor3=Color3.fromRGB(25,25,45)PlayerList.BorderSizePixel=0 PlayerList.Parent=FlingSF
+local PlayerList=Instance.new("ScrollingFrame")
+PlayerList.Size=UDim2.new(1,-8,0,380)
+PlayerList.Position=UDim2.new(0,4,0,5)
+PlayerList.BackgroundColor3=Color3.fromRGB(25,25,45)
+PlayerList.BorderSizePixel=0
+PlayerList.Parent=FlingSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=PlayerList
 
 local function RefreshList()
     pcall(function()
-        for _,c in pairs(PlayerList:GetChildren())do if c:IsA("TextButton")then c:Destroy()end end
+        for _,c in pairs(PlayerList:GetChildren())do
+            if c:IsA("TextButton")then c:Destroy()end
+        end
         local y=0
         for _,p in pairs(P:GetPlayers())do
             if p~=L then
-                local b=Instance.new("TextButton")b.Size=UDim2.new(1,-8,0,32)b.Position=UDim2.new(0,4,0,y)
-                b.BackgroundColor3=Color3.fromRGB(35,35,60)b.Text=p.Name b.TextColor3=Color3.fromRGB(200,220,255)
-                b.Font=Enum.Font.GothamBold b.TextSize=11 b.Parent=PlayerList
+                local b=Instance.new("TextButton")
+                b.Size=UDim2.new(1,-8,0,30)
+                b.Position=UDim2.new(0,4,0,y)
+                b.BackgroundColor3=Color3.fromRGB(35,35,60)
+                b.Text=p.Name
+                b.TextColor3=Color3.fromRGB(200,220,255)
+                b.Font=Enum.Font.GothamBold
+                b.TextSize=11
+                b.Parent=PlayerList
                 Instance.new("UICorner").CornerRadius=UDim.new(0,5)Instance.new("UICorner").Parent=b
                 b.MouseButton1Click:Connect(function()
                     pcall(function()
@@ -336,12 +479,17 @@ local function RefreshList()
                             hrp.CFrame=hrp.CFrame+Vector3.new(0,50,0)
                             hrp.Velocity=Vector3.new(math.random(-5000,5000),10000,math.random(-5000,5000))
                             hrp.RotVelocity=Vector3.new(math.random(-500,500),math.random(-500,500),math.random(-500,500))
-                            task.delay(.5,function()pcall(function()if p.Character and p.Character:FindFirstChild("HumanoidRootPart")then p.Character.HumanoidRootPart.CFrame=CFrame.new(0,-1000,0)end end)end)
-                            Notify("Flinged "..p.Name)
+                            task.delay(.5,function()
+                                pcall(function()
+                                    if p.Character and p.Character:FindFirstChild("HumanoidRootPart")then
+                                        p.Character.HumanoidRootPart.CFrame=CFrame.new(0,-1000,0)
+                                    end
+                                end)
+                            end)
                         end
                     end)
                 end)
-                y+=37
+                y+=35
             end
         end
         PlayerList.CanvasSize=UDim2.new(0,0,0,y)
@@ -349,36 +497,60 @@ local function RefreshList()
 end
 RefreshList()
 
-local RefreshBtn=Instance.new("TextButton")RefreshBtn.Size=UDim2.new(1,-8,0,30)RefreshBtn.Position=UDim2.new(0,4,0,360)
-RefreshBtn.BackgroundColor3=Color3.fromRGB(35,35,60)RefreshBtn.Text="Refresh"RefreshBtn.TextColor3=Color3.fromRGB(200,220,255)
-RefreshBtn.Font=Enum.Font.GothamBold RefreshBtn.TextSize=11 RefreshBtn.Parent=FlingSF
+local RefreshBtn=Instance.new("TextButton")
+RefreshBtn.Size=UDim2.new(1,-8,0,28)
+RefreshBtn.Position=UDim2.new(0,4,0,390)
+RefreshBtn.BackgroundColor3=Color3.fromRGB(35,35,60)
+RefreshBtn.Text="Refresh"
+RefreshBtn.TextColor3=Color3.fromRGB(200,220,255)
+RefreshBtn.Font=Enum.Font.GothamBold
+RefreshBtn.TextSize=11
+RefreshBtn.Parent=FlingSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,5)Instance.new("UICorner").Parent=RefreshBtn
 RefreshBtn.MouseButton1Click:Connect(RefreshList)
-FlingSF.CanvasSize=UDim2.new(0,0,0,395)
+FlingSF.CanvasSize=UDim2.new(0,0,0,425)
 
--- World
 local WorldSF=TabFrames.World
-local function mkBtn(parent,name,y,callback)
+local function mkBtn(parent,name,y,cb)
     pcall(function()
-        local b=Instance.new("TextButton")b.Size=UDim2.new(1,-8,0,38)b.Position=UDim2.new(0,4,0,y)
-        b.BackgroundColor3=Color3.fromRGB(60,100,200)b.Text=name b.TextColor3=Color3.fromRGB(255,255,255)
-        b.Font=Enum.Font.GothamBold b.TextSize=12 b.Parent=parent
+        local b=Instance.new("TextButton")
+        b.Size=UDim2.new(1,-8,0,36)
+        b.Position=UDim2.new(0,4,0,y)
+        b.BackgroundColor3=Color3.fromRGB(60,100,200)
+        b.Text=name
+        b.TextColor3=Color3.fromRGB(255,255,255)
+        b.Font=Enum.Font.GothamBold
+        b.TextSize=11
+        b.Parent=parent
         Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=b
-        b.MouseButton1Click:Connect(callback)
+        b.MouseButton1Click:Connect(cb)
     end)
 end
-mkBtn(WorldSF,"Teleport Lobby",5,function()pcall(function()local lobby=workspace:FindFirstChild("Lobby")or workspace:FindFirstChild("Spawn")if lobby and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then L.Character.HumanoidRootPart.CFrame=lobby.CFrame+Vector3.new(0,10,0)end end)end)
-mkBtn(WorldSF,"Teleport Map",47,function()pcall(function()local map=workspace:FindFirstChild("Map")or workspace:FindFirstChild("Arena")if map and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then L.Character.HumanoidRootPart.CFrame=map.CFrame+Vector3.new(0,10,0)end end)end)
-WorldSF.CanvasSize=UDim2.new(0,0,0,90)
+mkBtn(WorldSF,"Teleport Lobby",5,function()
+    pcall(function()
+        local lobby=workspace:FindFirstChild("Lobby")or workspace:FindFirstChild("Spawn")
+        if lobby and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
+            L.Character.HumanoidRootPart.CFrame=lobby.CFrame+Vector3.new(0,10,0)
+        end
+    end)
+end)
+mkBtn(WorldSF,"Teleport Map",45,function()
+    pcall(function()
+        local map=workspace:FindFirstChild("Map")or workspace:FindFirstChild("Arena")
+        if map and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
+            L.Character.HumanoidRootPart.CFrame=map.CFrame+Vector3.new(0,10,0)
+        end
+    end)
+end)
+WorldSF.CanvasSize=UDim2.new(0,0,0,85)
 
--- Settings
 local SettingsSF=TabFrames.Settings
 mkToggle(SettingsSF,"Auto Farm",5,"AutoFarm")
-mkSlider(SettingsSF,"Farm Speed",47,1,10,1,"FarmSpeed")
-mkToggle(SettingsSF,"Anti AFK",89,"AntiAFK")
-mkToggle(SettingsSF,"Inf Jump",131,"InfJump")
-mkToggle(SettingsSF,"No Fall",173,"NoFall")
-SettingsSF.CanvasSize=UDim2.new(0,0,0,220)
+mkSlider(SettingsSF,"Farm Speed",45,1,10,1,"FarmSpeed")
+mkToggle(SettingsSF,"Anti AFK",85,"AntiAFK")
+mkToggle(SettingsSF,"Inf Jump",125,"InfJump")
+mkToggle(SettingsSF,"No Fall",165,"NoFall")
+SettingsSF.CanvasSize=UDim2.new(0,0,0,210)
 
 -- ============ INIT ============
 TabFrames.Combat.Visible=true
@@ -389,37 +561,49 @@ Tabs.Combat.TextColor3=Color3.fromRGB(255,255,255)
 local EspHighlights={}
 
 local function getRole(p)
-    local bp=p:FindFirstChild("Backpack")
-    if bp then
-        if bp:FindFirstChild("Knife")then return"Murderer"end
-        if bp:FindFirstChild("Gun")then return"Sheriff"end
-    end
-    if p.Character then
-        if p.Character:FindFirstChild("Knife")then return"Murderer"end
-        if p.Character:FindFirstChild("Gun")or p.Character:FindFirstChild("Pistol")then return"Sheriff"end
-    end
+    pcall(function()
+        local bp=p:FindFirstChild("Backpack")
+        if bp then
+            if bp:FindFirstChild("Knife")then return"Murderer"end
+            if bp:FindFirstChild("Gun")then return"Sheriff"end
+        end
+        if p.Character then
+            if p.Character:FindFirstChild("Knife")then return"Murderer"end
+            if p.Character:FindFirstChild("Gun")or p.Character:FindFirstChild("Pistol")then return"Sheriff"end
+        end
+    end)
     return"Innocent"
 end
 
 local PlayersCache={}
-task.spawn(function()while true do pcall(function()PlayersCache=P:GetPlayers()end)task.wait(1)end end)
+task.spawn(function()
+    while true do
+        pcall(function()PlayersCache=P:GetPlayers()end)
+        task.wait(1)
+    end
+end)
 
 U.InputBegan:Connect(function(input,gameProcessed)
     if gameProcessed then return end
     if input.KeyCode==Enum.KeyCode.LeftAlt then
         M.Visible=not M.Visible
-    elseif input.KeyCode==Enum.KeyCode.LeftControl then S.Aim=not S.Aim
-    elseif input.KeyCode==Enum.KeyCode.F then S.Fl=not S.Fl
-    elseif input.KeyCode==Enum.KeyCode.G then S.Fly=not S.Fly
-    elseif input.KeyCode==Enum.KeyCode.N then S.NC=not S.NC
-    elseif input.KeyCode==Enum.KeyCode.E then S.ESP=not S.ESP end
+    elseif input.KeyCode==Enum.KeyCode.LeftControl then
+        S.Aim=not S.Aim
+    elseif input.KeyCode==Enum.KeyCode.F then
+        S.Fl=not S.Fl
+    elseif input.KeyCode==Enum.KeyCode.G then
+        S.Fly=not S.Fly
+    elseif input.KeyCode==Enum.KeyCode.N then
+        S.NC=not S.NC
+    elseif input.KeyCode==Enum.KeyCode.E then
+        S.ESP=not S.ESP
+    end
 end)
 
 R.RenderStepped:Connect(function()
     pcall(function()
         local players=PlayersCache
         
-        -- ESP (исправлен - не пропадает)
         if S.ESP or S.InnESP or S.MurESP or S.ShESP then
             for _,p in pairs(players)do
                 if p~=L and p.Character and p.Character:FindFirstChild("Head")then
@@ -455,7 +639,6 @@ R.RenderStepped:Connect(function()
             EspHighlights={}
         end
         
-        -- Chams
         if S.Ch then
             for _,p in pairs(players)do
                 if p~=L and p.Character then
@@ -469,7 +652,6 @@ R.RenderStepped:Connect(function()
             end
         end
         
-        -- XRay (исправлено выключение)
         if S.XRay then
             for _,v in pairs(workspace:GetDescendants())do
                 if v:IsA("BasePart")then v.LocalTransparencyModifier=.4 end
@@ -480,13 +662,14 @@ R.RenderStepped:Connect(function()
             end
         end
         
-        -- Speed
         if L.Character and L.Character:FindFirstChild("Humanoid")then
-            if S.SP then L.Character.Humanoid.WalkSpeed=16*S.SPMul
-            elseif not S.BunnyHop then L.Character.Humanoid.WalkSpeed=16 end
+            if S.SP then
+                L.Character.Humanoid.WalkSpeed=16*S.SPMul
+            elseif not S.BunnyHop then
+                L.Character.Humanoid.WalkSpeed=16
+            end
         end
         
-        -- BunnyHop
         if S.BunnyHop and L.Character and L.Character:FindFirstChild("Humanoid")then
             local hum=L.Character.Humanoid
             if U:IsKeyDown(Enum.KeyCode.Space)and hum.FloorMaterial~=Enum.Material.Air then
@@ -495,7 +678,6 @@ R.RenderStepped:Connect(function()
             end
         end
         
-        -- Fly
         if S.Fly and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
             local hrp=L.Character.HumanoidRootPart
             local dir=Vector3.new(0,0,0)
@@ -508,19 +690,16 @@ R.RenderStepped:Connect(function()
             hrp.Velocity=dir*S.FlySpeed
         end
         
-        -- Spin
         if S.Spin and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
             L.Character.HumanoidRootPart.CFrame=L.Character.HumanoidRootPart.CFrame*CFrame.Angles(0,math.rad(S.SpinSpeed),0)
         end
         
-        -- Noclip
         if S.NC and L.Character then
             for _,v in pairs(L.Character:GetDescendants())do
                 if v:IsA("BasePart")then v.CanCollide=false end
             end
         end
         
-        -- Fling All
         if S.Fl then
             for _,p in pairs(players)do
                 if p~=L and p.Character and p.Character:FindFirstChild("HumanoidRootPart")then
@@ -529,16 +708,15 @@ R.RenderStepped:Connect(function()
             end
         end
         
-        -- AntiFling
         if S.AntiFling and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
             if L.Character.HumanoidRootPart.Velocity.Magnitude>150 then
                 L.Character.HumanoidRootPart.Velocity=Vector3.new(0,0,0)
             end
         end
         
-        -- Aimbot
         if S.Aim and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
-            local closest=nil local minDist=S.AimRadius
+            local closest=nil
+            local minDist=S.AimRadius
             for _,p in pairs(players)do
                 if p~=L and p.Character and p.Character:FindFirstChild("Head")then
                     local d=(L.Character.HumanoidRootPart.Position-p.Character.Head.Position).Magnitude
@@ -550,13 +728,11 @@ R.RenderStepped:Connect(function()
             end
         end
         
-        -- God Mode
         if S.GM and L.Character and L.Character:FindFirstChild("Humanoid")then
             L.Character.Humanoid.MaxHealth=math.huge
             L.Character.Humanoid.Health=math.huge
         end
         
-        -- Kill Aura
         if S.KA and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
             for _,p in pairs(players)do
                 if p~=L and p.Character and p.Character:FindFirstChild("Humanoid")and p.Character:FindFirstChild("HumanoidRootPart")then
@@ -567,7 +743,6 @@ R.RenderStepped:Connect(function()
             end
         end
         
-        -- Reach
         if S.Reach and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
             for _,p in pairs(players)do
                 if p~=L and p.Character and p.Character:FindFirstChild("HumanoidRootPart")then
@@ -578,24 +753,20 @@ R.RenderStepped:Connect(function()
             end
         end
         
-        -- Inf Jump
         if S.InfJump and L.Character and L.Character:FindFirstChild("Humanoid")then
             L.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
         end
         
-        -- No Fall
         if S.NoFall and L.Character and L.Character:FindFirstChild("Humanoid")then
             L.Character.Humanoid.FallingDown=false
         end
         
-        -- Anti AFK
         if S.AntiAFK then
             VU:Button2Down(Vector2.new(0,0),C.CFrame)
             task.wait(.1)
             VU:Button2Up(Vector2.new(0,0),C.CFrame)
         end
         
-        -- Auto Farm
         if S.AutoFarm and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
             L.Character.HumanoidRootPart.CFrame=L.Character.HumanoidRootPart.CFrame+Vector3.new(0,0,S.FarmSpeed)
         end
@@ -605,14 +776,6 @@ end)
 -- ============ INTRO ANIMATION ============
 task.spawn(function()
     pcall(function()
-        for _,s in pairs(Stars)do
-            task.spawn(function()
-                while Intro.Parent do
-                    pcall(function()s.BackgroundTransparency=0.2+math.sin(tick()*2+s.Position.X.Offset)*0.4end)
-                    task.wait(.03)
-                end
-            end)
-        end
         T:Create(IntroBG,TweenInfo.new(.5),{BackgroundTransparency=0}):Play()
         task.wait(.2)
         T:Create(FixedText,TweenInfo.new(.4,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{TextTransparency=0}):Play()
@@ -642,4 +805,4 @@ task.spawn(function()
     end)
 end)
 
-Notify("Syphix v35 loaded!")
+Notify("Syphix v36 loaded!")
