@@ -1,4 +1,4 @@
--- Syphixman MM2 v23 | All Restored + Fixed
+-- Syphixman MM2 v28 Final | Everything Restored + All Fixes
 local P,R,U,T,C,L=game:GetService("Players"),game:GetService("RunService"),game:GetService("UserInputService"),game:GetService("TweenService"),workspace.CurrentCamera,game:GetService("Players").LocalPlayer
 local VU=game:GetService("VirtualUser")
 local Lighting=game:GetService("Lighting")
@@ -6,39 +6,40 @@ local Lighting=game:GetService("Lighting")
 local Lang="EN"
 local TR={
     EN={Title="SYPHIXMAN MM2",Combat="COMBAT",Visual="VISUAL",Anim="ANIM",Fling="FLING",World="WORLD",Settings="SETTINGS",
-        Aimbot="Aimbot",FlingAll="Fling All",Fly="Fly",Noclip="Noclip",SpeedHack="Speed Hack",GodMode="God Mode",KillAura="Kill Aura",Reach="Reach",Spin="Spin",BunnyHop="Bunny Hop",
-        AimRadius="Aimbot Radius",FlingPower="Fling Power",ReachDist="Reach Distance",SpeedMul="Speed Multiplier",SpinSpeed="Spin Speed",FarmSpeed="Farm Speed",
-        ESP="ESP",Tracers="Tracers",Chams="Chams",Fullbright="Fullbright",XRay="X-Ray",
+        Aimbot="Aimbot",FlingAll="Fling All",Fly="Fly",Noclip="Noclip",SpeedHack="Speed Hack",GodMode="God Mode",KillAura="Kill Aura",Reach="Reach",Spin="Spin",BunnyHop="Bunny Hop",AntiFling="Anti-Fling",
+        AimRadius="Aimbot Radius",AimFOV="Aimbot FOV",FlingPower="Fling Power",ReachDist="Reach Distance",SpeedMul="Speed Multiplier",SpinSpeed="Spin Speed",FarmSpeed="Farm Speed",AnimSpeed="Anim Speed",
+        ESP="ESP",Tracers="Tracers",Chams="Chams",Fullbright="Fullbright",RainbowESP="Rainbow ESP",XRay="X-Ray",
         InnocentESP="Innocent ESP",MurdererESP="Murderer ESP",SheriffESP="Sheriff ESP",
         FreeAnim="Free Animations",InfJump="Infinite Jump",NoFall="No Fall Damage",
         SelectPlayer="Select Player",FlingButton="FLING",RefreshList="Refresh",
         ShootMurderer="Shoot Murderer",TakeGun="Take Gun",AntiAFK="Anti-AFK",AutoFarm="Auto Farm",
         TeleportLobby="Teleport to Lobby",TeleportMap="Teleport to Map",
-        SaveConfig="Save Config",Reset="Reset",Language="Language",
-        ON="ON",OFF="OFF",Loaded="loaded!",Flung="flung!",ConfigSaved="Saved!",ResetDone="Reset!",PhoneButtons="Show Phone Buttons"},
+        SaveConfig="Save Config",LoadConfig="Load Config",Reset="Reset",Language="Language",
+        ON="ON",OFF="OFF",Loaded="loaded!",Flung="flung!",ConfigSaved="Saved!",ConfigLoaded="Loaded!",ResetDone="Reset!",PhoneButtons="Show Phone Buttons"},
     RU={Title="SYPHIXMAN MM2",Combat="КОМБАТ",Visual="ВИЗУАЛ",Anim="АНИМ",Fling="ФЛИНГ",World="МИР",Settings="НАСТР",
-        Aimbot="Аимбот",FlingAll="Флинг всех",Fly="Полёт",Noclip="Ноклип",SpeedHack="Спидхак",GodMode="Годмод",KillAura="Килл аура",Reach="Дотягивание",Spin="Вращение",BunnyHop="Баннихоп",
-        AimRadius="Радиус аима",FlingPower="Сила флинга",ReachDist="Дистанция reach",SpeedMul="Множитель скорости",SpinSpeed="Скорость вращения",FarmSpeed="Скорость фарма",
-        ESP="ЕСП",Tracers="Трейсеры",Chams="Чамс",Fullbright="Фуллбрайт",XRay="Рентген",
+        Aimbot="Аимбот",FlingAll="Флинг всех",Fly="Полёт",Noclip="Ноклип",SpeedHack="Спидхак",GodMode="Годмод",KillAura="Килл аура",Reach="Дотягивание",Spin="Вращение",BunnyHop="Баннихоп",AntiFling="Анти-флинг",
+        AimRadius="Радиус аима",AimFOV="ФОВ аима",FlingPower="Сила флинга",ReachDist="Дистанция reach",SpeedMul="Множитель скорости",SpinSpeed="Скорость вращения",FarmSpeed="Скорость фарма",AnimSpeed="Скорость анимаций",
+        ESP="ЕСП",Tracers="Трейсеры",Chams="Чамс",Fullbright="Фуллбрайт",RainbowESP="Радужный ЕСП",XRay="Рентген",
         InnocentESP="ЕСП невиновных",MurdererESP="ЕСП мардера",SheriffESP="ЕСП шерифа",
         FreeAnim="Свободные анимации",InfJump="Бесконечный прыжок",NoFall="Нет урона",
         SelectPlayer="Выберите игрока",FlingButton="ФЛИНГ",RefreshList="Обновить",
         ShootMurderer="Стрельнуть",TakeGun="Забрать пистолет",AntiAFK="Анти-АФК",AutoFarm="Авто-фарм",
         TeleportLobby="В лобби",TeleportMap="На карту",
-        SaveConfig="Сохранить",Reset="Сброс",Language="Язык",
-        ON="ВКЛ",OFF="ВЫКЛ",Loaded="загружен!",Flung="зафлинген!",ConfigSaved="Сохранено!",ResetDone="Сброшено!",PhoneButtons="Показать кнопки"}
+        SaveConfig="Сохранить",LoadConfig="Загрузить",Reset="Сброс",Language="Язык",
+        ON="ВКЛ",OFF="ВЫКЛ",Loaded="загружен!",Flung="зафлинген!",ConfigSaved="Сохранено!",ConfigLoaded="Загружено!",ResetDone="Сброшено!",PhoneButtons="Показать кнопки"}
 }
 local function t(key)return TR[Lang][key]or key end
 
 local S={
-    Aim=false,AimRadius=500,Fl=false,FlPower=15,Fly=false,FlySpeed=50,NC=false,SP=false,SPMul=2,GM=false,
+    Aim=false,AimRadius=500,AimFOV=90,Fl=false,FlPower=15,Fly=false,FlySpeed=50,NC=false,SP=false,SPMul=2,GM=false,
     KA=false,KARadius=30,KADamage=100,ESP=false,ESPColor=Color3.fromRGB(100,180,255),
-    InnESP=false,MurESP=false,ShESP=false,Tr=false,Ch=false,FB=false,
-    FA=false,InfJump=false,NoFall=false,AntiAFK=false,XRay=false,Reach=false,ReachDist=20,
-    AutoFarm=false,FarmSpeed=1,Spin=false,SpinSpeed=10,BunnyHop=false,ShowPhoneButtons=false,SelectedPlayer=nil
+    InnESP=false,MurESP=false,ShESP=false,Tr=false,Ch=false,FB=false,Rainbow=false,
+    FA=false,AnimSpeed=1,InfJump=false,NoFall=false,AntiAFK=false,XRay=false,Reach=false,ReachDist=20,
+    AutoFarm=false,FarmSpeed=1,Spin=false,SpinSpeed=10,BunnyHop=false,AntiFling=false,ShowPhoneButtons=false,SelectedPlayer=nil
 }
 
 local BHopActive=false
+local TabSwitching=false
 
 local function Notify(text)
     local N=Instance.new("TextLabel")N.Size=UDim2.new(0,240,0,40)N.Position=UDim2.new(1,260,0,15)
@@ -80,7 +81,7 @@ BetaText.BackgroundTransparency=1 BetaText.Text="BETA VERSION"BetaText.TextColor
 BetaText.Font=Enum.Font.GothamBold BetaText.TextSize=22 BetaText.TextTransparency=1 BetaText.Parent=IntroGui
 
 local VerText=Instance.new("TextLabel")VerText.Size=UDim2.new(0,300,0,30)VerText.Position=UDim2.new(.5,-150,.5,115)
-VerText.BackgroundTransparency=1 VerText.Text="v23.0 | by Ryzen"VerText.TextColor3=Color3.fromRGB(100,100,150)
+VerText.BackgroundTransparency=1 VerText.Text="v28.0 | by Ryzen"VerText.TextColor3=Color3.fromRGB(100,100,150)
 VerText.Font=Enum.Font.Gotham VerText.TextSize=16 VerText.TextTransparency=1 VerText.Parent=IntroGui
 
 local ProgF=Instance.new("Frame")ProgF.Size=UDim2.new(0,300,0,6)ProgF.Position=UDim2.new(.5,-150,.5,160)
@@ -138,22 +139,34 @@ for _,tab in pairs(TabData)do
     TabFrames[tab[1]]=SF
 end
 
+-- Исправленное переключение вкладок
 local function SwitchTab(name)
+    if TabSwitching then return end
+    TabSwitching=true
+    
     for n,b in pairs(Tabs)do
-        T:Create(b,TweenInfo.new(.4,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{
+        T:Create(b,TweenInfo.new(.3,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{
             BackgroundColor3=n==name and Color3.fromRGB(60,100,200)or Color3.fromRGB(25,25,45),
             TextColor3=n==name and Color3.fromRGB(255,255,255)or Color3.fromRGB(120,140,180)
         }):Play()
     end
+    
+    -- Сначала скрываем все
     for n,f in pairs(TabFrames)do
-        if n==name then
-            f.Visible=true f.Position=UDim2.new(0,30,0,0)
-            T:Create(f,TweenInfo.new(.5,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position=UDim2.new(0,0,0,0)}):Play()
-        else
-            T:Create(f,TweenInfo.new(.3,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Position=UDim2.new(0,-30,0,0)}):Play()
-            task.delay(.3,function()if n~=name then f.Visible=false end end)
+        if n~=name then
+            T:Create(f,TweenInfo.new(.2,Enum.EasingStyle.Quad,Enum.EasingDirection.In),{Position=UDim2.new(0,-30,0,0)}):Play()
+            task.delay(.2,function()if n~=name then f.Visible=false end end)
         end
     end
+    
+    -- Потом показываем нужную
+    task.delay(.2,function()
+        local f=TabFrames[name]
+        f.Visible=true
+        f.Position=UDim2.new(0,30,0,0)
+        T:Create(f,TweenInfo.new(.4,Enum.EasingStyle.Quint,Enum.EasingDirection.Out),{Position=UDim2.new(0,0,0,0)}):Play()
+        TabSwitching=false
+    end)
 end
 
 for i,tab in pairs(TabData)do
@@ -259,12 +272,14 @@ mkToggle(CombatSF,t("KillAura"),"⚔",281,"KA")
 mkToggle(CombatSF,t("Reach"),"📏",327,"Reach")
 mkToggle(CombatSF,t("Spin"),"🌀",373,"Spin")
 mkToggle(CombatSF,t("BunnyHop"),"🦘",419,"BunnyHop")
-mkSlider(CombatSF,t("AimRadius"),470,100,2000,500,"AimRadius")
-mkSlider(CombatSF,t("FlingPower"),509,1,50,15,"FlPower")
-mkSlider(CombatSF,t("ReachDist"),548,5,50,20,"ReachDist")
-mkSlider(CombatSF,t("SpeedMul"),587,1,10,2,"SPMul")
-mkSlider(CombatSF,t("SpinSpeed"),626,1,50,10,"SpinSpeed")
-CombatSF.CanvasSize=UDim2.new(0,0,0,670)
+mkToggle(CombatSF,t("AntiFling"),"🛡",465,"AntiFling")
+mkSlider(CombatSF,t("AimRadius"),516,100,2000,500,"AimRadius")
+mkSlider(CombatSF,t("AimFOV"),555,30,360,90,"AimFOV")
+mkSlider(CombatSF,t("FlingPower"),594,1,50,15,"FlPower")
+mkSlider(CombatSF,t("ReachDist"),633,5,50,20,"ReachDist")
+mkSlider(CombatSF,t("SpeedMul"),672,1,10,2,"SPMul")
+mkSlider(CombatSF,t("SpinSpeed"),711,1,50,10,"SpinSpeed")
+CombatSF.CanvasSize=UDim2.new(0,0,0,760)
 
 local VisualSF=TabFrames.Visual
 mkToggle(VisualSF,"ESP","👁",5,"ESP")
@@ -274,14 +289,16 @@ mkToggle(VisualSF,t("SheriffESP"),"🔵",143,"ShESP")
 mkToggle(VisualSF,t("Tracers"),"📛",189,"Tr")
 mkToggle(VisualSF,t("Chams"),"👻",235,"Ch")
 mkToggle(VisualSF,t("Fullbright"),"🌟",281,"FB")
-mkToggle(VisualSF,t("XRay"),"💀",327,"XRay")
-VisualSF.CanvasSize=UDim2.new(0,0,0,375)
+mkToggle(VisualSF,t("RainbowESP"),"🌈",327,"Rainbow")
+mkToggle(VisualSF,t("XRay"),"💀",373,"XRay")
+VisualSF.CanvasSize=UDim2.new(0,0,0,420)
 
 local AnimSF=TabFrames.Anim
 mkToggle(AnimSF,t("FreeAnim"),"🎭",5,"FA")
 mkToggle(AnimSF,t("InfJump"),"🦘",51,"InfJump")
 mkToggle(AnimSF,t("NoFall"),"🍃",97,"NoFall")
-AnimSF.CanvasSize=UDim2.new(0,0,0,145)
+mkSlider(AnimSF,t("AnimSpeed"),147,.1,5,1,"AnimSpeed")
+AnimSF.CanvasSize=UDim2.new(0,0,0,190)
 
 -- FLING
 local FlingSF=TabFrames.Fling
@@ -376,9 +393,18 @@ RUBtn.MouseButton1Click:Connect(function()Lang="RU"T:Create(RUBtn,TweenInfo.new(
 mkToggle(SettingsSF,t("PhoneButtons"),"📱",60,"ShowPhoneButtons")
 mkToggle(SettingsSF,t("AutoFarm"),"💰",107,"AutoFarm")
 mkSlider(SettingsSF,t("FarmSpeed"),158,1,10,1,"FarmSpeed")
-mkButton(SettingsSF,t("SaveConfig"),"💾",198,Color3.fromRGB(200,150,50),function()Notify(t("ConfigSaved"))end)
-mkButton(SettingsSF,t("Reset"),"🔄",245,Color3.fromRGB(200,60,60),function()Notify(t("ResetDone"))end)
-SettingsSF.CanvasSize=UDim2.new(0,0,0,295)
+mkButton(SettingsSF,t("SaveConfig"),"💾",198,Color3.fromRGB(200,150,50),function()
+    if writefile then writefile("syphix_config.json",game:GetService("HttpService"):JSONEncode(S))Notify(t("ConfigSaved"))end
+end)
+mkButton(SettingsSF,t("LoadConfig"),"📂",245,Color3.fromRGB(200,150,50),function()
+    if readfile and isfile and isfile("syphix_config.json")then
+        local data=game:GetService("HttpService"):JSONDecode(readfile("syphix_config.json"))
+        for k,v in pairs(data)do S[k]=v end
+        Notify(t("ConfigLoaded"))
+    end
+end)
+mkButton(SettingsSF,t("Reset"),"🔄",292,Color3.fromRGB(200,60,60),function()Notify(t("ResetDone"))end)
+SettingsSF.CanvasSize=UDim2.new(0,0,0,340)
 
 -- ============ PHONE BUTTONS ============
 local PBF=Instance.new("Frame")PBF.Size=UDim2.new(0,50,0,180)PBF.Position=UDim2.new(1,-60,.5,-90)
@@ -406,12 +432,21 @@ Tabs.Combat.TextColor3=Color3.fromRGB(255,255,255)
 
 -- ============ LOGIC ============
 local EspHighlights={}
+local TracerLines={}
 
 local function getRole(role)
     for _,p in pairs(P:GetPlayers())do
         if p~=L and p.Character then
-            local rv=p.Character:FindFirstChild("Role")or p:FindFirstChild("Role")
-            if rv and rv.Value==role then return p end
+            local rv=p.Character:FindFirstChild("Role")or p:FindFirstChild("Role")or p:FindFirstChild("Murderer")or p:FindFirstChild("Sheriff")
+            if rv then
+                if rv.Value==role or rv.Name==role then return p end
+            end
+            -- Альтернативные проверки
+            local backpack=p:FindFirstChild("Backpack")
+            if backpack then
+                if role=="Murderer"and backpack:FindFirstChild("Knife")then return p end
+                if role=="Sheriff"and backpack:FindFirstChild("Gun")then return p end
+            end
         end
     end
     return nil
@@ -425,8 +460,43 @@ end
 local function takeGun()
     local sh=getRole("Sheriff")
     if sh and sh.Character then
-        local gun=sh.Character:FindFirstChild("Gun")or sh.Character:FindFirstChild("Pistol")
-        if gun then gun.Parent=L.Character end
+        local gun=sh.Character:FindFirstChild("Gun")or sh.Character:FindFirstChild("Pistol")or sh.Backpack and sh.Backpack:FindFirstChild("Gun")
+        if gun then gun.Parent=L.Backpack or L.Character end
+    end
+end
+
+-- Tracers
+local function CreateTracers()
+    RemoveTracers()
+    for _,p in pairs(P:GetPlayers())do
+        if p~=L and p.Character and p.Character:FindFirstChild("Head")then
+            local line=Drawing.new("Line")
+            line.Color=Color3.fromRGB(100,180,255)
+            line.Thickness=2
+            line.Transparency=0.5
+            TracerLines[p]=line
+        end
+    end
+end
+
+local function RemoveTracers()
+    for p,line in pairs(TracerLines)do
+        if line then line:Remove()end
+        TracerLines[p]=nil
+    end
+end
+
+local function UpdateTracers()
+    for p,line in pairs(TracerLines)do
+        if p.Character and p.Character:FindFirstChild("Head")and L.Character and L.Character:FindFirstChild("Head")then
+            local sp,os=C:WorldToScreenPoint(p.Character.Head.Position)
+            local msp,mos=C:WorldToScreenPoint(L.Character.Head.Position)
+            if os and mos then
+                line.From=Vector2.new(msp.X,msp.Y)
+                line.To=Vector2.new(sp.X,sp.Y)
+                line.Visible=true
+            else line.Visible=false end
+        else line.Visible=false end
     end
 end
 
@@ -442,32 +512,87 @@ end)
 R.RenderStepped:Connect(function()
     PBF.Visible=S.ShowPhoneButtons
     
-    -- ESP
-    local inLobby=false
-    if L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
-        local lobby=workspace:FindFirstChild("Lobby")or workspace:FindFirstChild("Spawn")
-        if lobby and (L.Character.HumanoidRootPart.Position-lobby.Position).Magnitude<50 then inLobby=true end
-    end
-    if not inLobby and (S.ESP or S.InnESP or S.MurESP or S.ShESP)then
+    -- ESP (Persistent - не пропадает между раундами)
+    if S.ESP or S.InnESP or S.MurESP or S.ShESP then
         for _,p in pairs(P:GetPlayers())do
             if p~=L and p.Character and p.Character:FindFirstChild("Head")then
                 local role="Innocent"
                 local rv=p.Character:FindFirstChild("Role")or p:FindFirstChild("Role")
                 if rv then role=rv.Value end
+                -- Проверка через Backpack
+                local bp=p:FindFirstChild("Backpack")
+                if bp then
+                    if bp:FindFirstChild("Knife")then role="Murderer"end
+                    if bp:FindFirstChild("Gun")then role="Sheriff"end
+                end
+                -- Проверка через предметы в руках
+                if p.Character:FindFirstChild("Knife")then role="Murderer"end
+                if p.Character:FindFirstChild("Gun")or p.Character:FindFirstChild("Pistol")then role="Sheriff"end
+                
                 local show=false local color=Color3.fromRGB(100,180,255)
                 if S.ESP then show=true;color=S.ESPColor end
+                if S.Rainbow then show=true;color=Color3.fromHSV(tick()%1,1,1)end
                 if role=="Innocent"and S.InnESP then show=true;color=Color3.fromRGB(0,255,100)end
                 if role=="Murderer"and S.MurESP then show=true;color=Color3.fromRGB(255,50,50)end
                 if role=="Sheriff"and S.ShESP then show=true;color=Color3.fromRGB(50,100,255)end
+                
                 if show then
-                    if not EspHighlights[p]or not EspHighlights[p].Parent then
+                    local existing=EspHighlights[p]
+                    if not existing or not existing.Parent then
                         local h=Instance.new("Highlight")h.FillColor=color h.OutlineColor=Color3.fromRGB(255,255,255)h.FillTransparency=.6 h.Parent=p.Character EspHighlights[p]=h
-                    else EspHighlights[p].FillColor=color end
-                elseif EspHighlights[p]and EspHighlights[p].Parent then EspHighlights[p]:Destroy()EspHighlights[p]=nil end
+                    else
+                        existing.FillColor=color
+                        if not existing.Parent then existing.Parent=p.Character end
+                    end
+                elseif EspHighlights[p]and EspHighlights[p].Parent then
+                    EspHighlights[p]:Destroy()EspHighlights[p]=nil
+                end
             end
         end
     else
         for p,h in pairs(EspHighlights)do if h and h.Parent then h:Destroy()end EspHighlights[p]=nil end
+    end
+    
+    -- Chams (работающий)
+    if S.Ch then
+        for _,p in pairs(P:GetPlayers())do
+            if p~=L and p.Character then
+                for _,v in pairs(p.Character:GetDescendants())do
+                    if v:IsA("BasePart")and not v:FindFirstChild("ChamTag")then
+                        local tag=Instance.new("BoolValue")tag.Name="ChamTag"tag.Parent=v
+                        v.LocalTransparencyModifier=0.3
+                        v.Material=Enum.Material.ForceField
+                    end
+                end
+            end
+        end
+    else
+        for _,p in pairs(P:GetPlayers())do
+            if p~=L and p.Character then
+                for _,v in pairs(p.Character:GetDescendants())do
+                    if v:IsA("BasePart")and v:FindFirstChild("ChamTag")then
+                        v.ChamTag:Destroy()
+                        v.LocalTransparencyModifier=0
+                        v.Material=Enum.Material.Plastic
+                    end
+                end
+            end
+        end
+    end
+    
+    -- Tracers
+    if S.Tr then
+        if next(TracerLines)==nil then CreateTracers()end
+        UpdateTracers()
+    else RemoveTracers()end
+    
+    -- AntiFling
+    if S.AntiFling and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
+        local hrp=L.Character.HumanoidRootPart
+        if hrp.Velocity.Magnitude>200 or hrp.RotVelocity.Magnitude>50 then
+            hrp.Velocity=Vector3.new(0,0,0)
+            hrp.RotVelocity=Vector3.new(0,0,0)
+        end
     end
     
     -- Speed Hack
@@ -582,4 +707,4 @@ task.spawn(function()
     end
 end)
 
-Notify("🔷 Syphixman v23 "..t("Loaded"))
+Notify("🔷 Syphixman v28 "..t("Loaded"))
