@@ -1,4 +1,4 @@
--- SYPHIX HUB | v14 | Fling Tab + Grab Gun
+-- SYPHIX HUB | v15 | ESP 24/7 Persistent
 local P,R,U,T,C,L=game:GetService("Players"),game:GetService("RunService"),game:GetService("UserInputService"),game:GetService("TweenService"),workspace.CurrentCamera,game:GetService("Players").LocalPlayer
 local VU=game:GetService("VirtualUser")
 
@@ -36,6 +36,162 @@ local HideKey="LeftAlt"
 local EspHighlights={}
 local EspBoxes={}
 
+-- ============ РОЛИ (всегда актуально) ============
+function getRole(p)
+    if not p then return"Innocent"end
+    
+    -- Проверка Character
+    if p.Character then
+        for _,child in pairs(p.Character:GetChildren())do
+            if child:IsA("Tool")then
+                local n=child.Name:lower()
+                if n:find("knife")or n:find("murder")or n:find("blade")then return"Murderer"end
+                if n:find("gun")or n:find("pistol")or n:find("revolver")or n:find("sheriff")then return"Sheriff"end
+            end
+        end
+    end
+    
+    -- Проверка Backpack
+    local bp=p:FindFirstChild("Backpack")
+    if bp then
+        for _,child in pairs(bp:GetChildren())do
+            if child:IsA("Tool")then
+                local n=child.Name:lower()
+                if n:find("knife")or n:find("murder")or n:find("blade")then return"Murderer"end
+                if n:find("gun")or n:find("pistol")or n:find("revolver")or n:find("sheriff")then return"Sheriff"end
+            end
+        end
+    end
+    
+    -- Проверка PlayerGui
+    local pg=p:FindFirstChild("PlayerGui")
+    if pg then
+        for _,child in pairs(pg:GetChildren())do
+            local n=child.Name:lower()
+            if n:find("murder")then return"Murderer"end
+            if n:find("sheriff")then return"Sheriff"end
+        end
+    end
+    
+    return"Innocent"
+end
+
+-- ============ ESP 24/7 ============
+-- Главная функция ESP которая вызывается КАЖДЫЙ кадр
+local function UpdateESP()
+    pcall(function()
+        -- Очищаем невалидные
+        for p,h in pairs(EspHighlights)do
+            if not h or not h.Parent or not p or not p.Parent then
+                if h then pcall(function()h:Destroy()end)end
+                EspHighlights[p]=nil
+            end
+        end
+        
+        -- ESP
+        if ESP_Enabled or ESP_Murderer or ESP_Sheriff or ESP_Innocent then
+            for _,p in pairs(P:GetPlayers())do
+                if p~=L and p.Character and p.Character:FindFirstChild("Head")then
+                    local role=getRole(p)
+                    local show=false
+                    local color=Color3.fromRGB(100,180,255)
+                    
+                    if ESP_Enabled then show=true end
+                    if role=="Murderer"and ESP_Murderer then show=true;color=Color3.fromRGB(255,50,50)end
+                    if role=="Sheriff"and ESP_Sheriff then show=true;color=Color3.fromRGB(50,100,255)end
+                    if role=="Innocent"and ESP_Innocent then show=true;color=Color3.fromRGB(0,255,100)end
+                    
+                    if show then
+                        local existing=EspHighlights[p]
+                        if not existing or not existing.Parent then
+                            -- Создаём новый Highlight
+                            existing=Instance.new("Highlight")
+                            existing.Name="ESP_"..p.Name
+                            existing.FillColor=color
+                            existing.FillTransparency=0.5
+                            existing.OutlineColor=color
+                            existing.OutlineTransparency=0
+                            existing.Parent=p.Character
+                            EspHighlights[p]=existing
+                        else
+                            -- Обновляем цвет
+                            existing.FillColor=color
+                            existing.OutlineColor=color
+                            if not existing.Parent then
+                                existing.Parent=p.Character
+                            end
+                        end
+                    else
+                        -- Убираем если не нужно показывать
+                        if EspHighlights[p]then
+                            pcall(function()EspHighlights[p]:Destroy()end)
+                            EspHighlights[p]=nil
+                        end
+                    end
+                end
+            end
+        else
+            -- Всё выключено - очищаем
+            for p,h in pairs(EspHighlights)do
+                pcall(function()h:Destroy()end)
+                EspHighlights[p]=nil
+            end
+        end
+        
+        -- Boxes
+        for p,h in pairs(EspBoxes)do
+            if not h or not h.Parent or not p or not p.Parent then
+                if h then pcall(function()h:Destroy()end)end
+                EspBoxes[p]=nil
+            end
+        end
+        
+        if Boxes_Enabled or Boxes_Murderer or Boxes_Sheriff or Boxes_Innocent then
+            for _,p in pairs(P:GetPlayers())do
+                if p~=L and p.Character and p.Character:FindFirstChild("Head")then
+                    local role=getRole(p)
+                    local show=false
+                    local color=Color3.fromRGB(100,180,255)
+                    
+                    if Boxes_Enabled then show=true end
+                    if role=="Murderer"and Boxes_Murderer then show=true;color=Color3.fromRGB(255,50,50)end
+                    if role=="Sheriff"and Boxes_Sheriff then show=true;color=Color3.fromRGB(50,100,255)end
+                    if role=="Innocent"and Boxes_Innocent then show=true;color=Color3.fromRGB(0,255,100)end
+                    
+                    if show then
+                        local existing=EspBoxes[p]
+                        if not existing or not existing.Parent then
+                            existing=Instance.new("Highlight")
+                            existing.Name="Box_"..p.Name
+                            existing.FillColor=Color3.fromRGB(0,0,0)
+                            existing.FillTransparency=1
+                            existing.OutlineColor=color
+                            existing.OutlineTransparency=0
+                            existing.Parent=p.Character
+                            EspBoxes[p]=existing
+                        else
+                            existing.OutlineColor=color
+                            if not existing.Parent then
+                                existing.Parent=p.Character
+                            end
+                        end
+                    else
+                        if EspBoxes[p]then
+                            pcall(function()EspBoxes[p]:Destroy()end)
+                            EspBoxes[p]=nil
+                        end
+                    end
+                end
+            end
+        else
+            for p,h in pairs(EspBoxes)do
+                pcall(function()h:Destroy()end)
+                EspBoxes[p]=nil
+            end
+        end
+    end)
+end
+
 -- ============ ЛАУНЧЕР ============
 local LG=Instance.new("ScreenGui")LG.Name="Launcher"LG.Parent=GetHui()
 
@@ -46,14 +202,6 @@ TopBar.BackgroundColor3=Color3.fromRGB(15,15,30)
 TopBar.BorderSizePixel=0
 TopBar.Parent=LG
 Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=TopBar
-
-local TopBarLogo=Instance.new("Frame")
-TopBarLogo.Size=UDim2.new(0,20,0,20)
-TopBarLogo.Position=UDim2.new(0,10,0,10)
-TopBarLogo.BackgroundColor3=Color3.fromRGB(255,200,50)
-TopBarLogo.BorderSizePixel=0
-TopBarLogo.Parent=TopBar
-Instance.new("UICorner").CornerRadius=UDim.new(1,0)Instance.new("UICorner").Parent=TopBarLogo
 
 local TopBarText=Instance.new("TextLabel")
 TopBarText.Size=UDim2.new(0,140,0,25)
@@ -87,29 +235,11 @@ LauncherMenu.Visible=false
 LauncherMenu.Parent=LG
 Instance.new("UICorner").CornerRadius=UDim.new(0,16)Instance.new("UICorner").Parent=LauncherMenu
 
-local LauncherHeader=Instance.new("Frame")
-LauncherHeader.Size=UDim2.new(1,0,0,60)
-LauncherHeader.BackgroundColor3=Color3.fromRGB(18,18,35)
-LauncherHeader.BorderSizePixel=0
-LauncherHeader.Parent=LauncherMenu
-Instance.new("UICorner").CornerRadius=UDim.new(0,16)Instance.new("UICorner").Parent=LauncherHeader
-
-local LauncherTitle=Instance.new("TextLabel")
-LauncherTitle.Size=UDim2.new(0,200,0,25)
-LauncherTitle.Position=UDim2.new(0,15,0,10)
-LauncherTitle.BackgroundTransparency=1
-LauncherTitle.Text="SYPHIX HUB"
-LauncherTitle.TextColor3=Color3.fromRGB(255,255,255)
-LauncherTitle.Font=Enum.Font.GothamBlack
-LauncherTitle.TextSize=16
-LauncherTitle.Parent=LauncherHeader
-
 local LauncherContent=Instance.new("ScrollingFrame")
-LauncherContent.Size=UDim2.new(1,-20,1,-75)
-LauncherContent.Position=UDim2.new(0,10,0,65)
+LauncherContent.Size=UDim2.new(1,-20,1,-20)
+LauncherContent.Position=UDim2.new(0,10,0,10)
 LauncherContent.BackgroundTransparency=1
 LauncherContent.BorderSizePixel=0
-LauncherContent.ScrollBarThickness=3
 LauncherContent.Parent=LauncherMenu
 
 local MM2Card=Instance.new("TextButton")
@@ -120,26 +250,9 @@ MM2Card.Text=""
 MM2Card.Parent=LauncherContent
 Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=MM2Card
 
-local MM2Icon=Instance.new("Frame")
-MM2Icon.Size=UDim2.new(0,35,0,35)
-MM2Icon.Position=UDim2.new(0,5,0,5)
-MM2Icon.BackgroundColor3=Color3.fromRGB(255,80,80)
-MM2Icon.BorderSizePixel=0
-MM2Icon.Parent=MM2Card
-Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=MM2Icon
-
-local MM2IconText=Instance.new("TextLabel")
-MM2IconText.Size=UDim2.new(1,0,1,0)
-MM2IconText.BackgroundTransparency=1
-MM2IconText.Text="[M]"
-MM2IconText.TextColor3=Color3.fromRGB(15,15,25)
-MM2IconText.Font=Enum.Font.GothamBlack
-MM2IconText.TextSize=12
-MM2IconText.Parent=MM2Icon
-
 local MM2Name=Instance.new("TextLabel")
-MM2Name.Size=UDim2.new(1,-50,1,0)
-MM2Name.Position=UDim2.new(0,45,0,0)
+MM2Name.Size=UDim2.new(1,-80,1,0)
+MM2Name.Position=UDim2.new(0,50,0,0)
 MM2Name.BackgroundTransparency=1
 MM2Name.Text="Murder Mystery 2"
 MM2Name.TextColor3=Color3.fromRGB(255,255,255)
@@ -253,35 +366,33 @@ local MM2TabNames={"Combat","Visual","Fling","Others"}
 
 for i=1,4 do
     local name=MM2TabNames[i]
-    pcall(function()
-        local SF=Instance.new("ScrollingFrame")
-        SF.Size=UDim2.new(1,0,1,0)
-        SF.BackgroundTransparency=1
-        SF.BorderSizePixel=0
-        SF.ScrollBarThickness=2
-        SF.Visible=false
-        SF.Parent=MM2Content
-        MM2TabFrames[name]=SF
-        
-        local b=Instance.new("TextButton")
-        b.Size=UDim2.new(1,-10,0,50)
-        b.Position=UDim2.new(0,5,0,5+(i-1)*55)
-        b.BackgroundColor3=Color3.fromRGB(20,20,38)
-        b.Text=name
-        b.TextColor3=Color3.fromRGB(120,140,180)
-        b.Font=Enum.Font.GothamBold
-        b.TextSize=11
-        b.Parent=MM2Tabs
-        Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
-        b.MouseButton1Click:Connect(function()
-            for n,btn in pairs(MM2TabButtons)do
-                btn.BackgroundColor3=n==name and Color3.fromRGB(60,100,200)or Color3.fromRGB(20,20,38)
-                btn.TextColor3=n==name and Color3.fromRGB(255,255,255)or Color3.fromRGB(120,140,180)
-            end
-            for n,f in pairs(MM2TabFrames)do f.Visible=n==name end
-        end)
-        MM2TabButtons[name]=b
+    local SF=Instance.new("ScrollingFrame")
+    SF.Size=UDim2.new(1,0,1,0)
+    SF.BackgroundTransparency=1
+    SF.BorderSizePixel=0
+    SF.ScrollBarThickness=2
+    SF.Visible=false
+    SF.Parent=MM2Content
+    MM2TabFrames[name]=SF
+    
+    local b=Instance.new("TextButton")
+    b.Size=UDim2.new(1,-10,0,50)
+    b.Position=UDim2.new(0,5,0,5+(i-1)*55)
+    b.BackgroundColor3=Color3.fromRGB(20,20,38)
+    b.Text=name
+    b.TextColor3=Color3.fromRGB(120,140,180)
+    b.Font=Enum.Font.GothamBold
+    b.TextSize=11
+    b.Parent=MM2Tabs
+    Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
+    b.MouseButton1Click:Connect(function()
+        for n,btn in pairs(MM2TabButtons)do
+            btn.BackgroundColor3=n==name and Color3.fromRGB(60,100,200)or Color3.fromRGB(20,20,38)
+            btn.TextColor3=n==name and Color3.fromRGB(255,255,255)or Color3.fromRGB(120,140,180)
+        end
+        for n,f in pairs(MM2TabFrames)do f.Visible=n==name end
     end)
+    MM2TabButtons[name]=b
 end
 
 -- ============ COMBAT ============
@@ -359,7 +470,6 @@ local function mkToggleWithSub(parent,name,y,subContent,subHeight,onToggle)
     end)
 end
 
--- Aimbot
 mkToggleWithSub(CombatSF,"Aimbot",5,function(sub)
     local info=Instance.new("TextLabel")
     info.Size=UDim2.new(1,0,0,25)
@@ -372,7 +482,6 @@ mkToggleWithSub(CombatSF,"Aimbot",5,function(sub)
     info.Parent=sub
 end,80,function(state)Aimbot_Enabled=state end)
 
--- Kill All
 mkToggleWithSub(CombatSF,"Kill All",130,function(sub)
     local wl=Instance.new("ScrollingFrame")
     wl.Size=UDim2.new(1,-10,0,200)
@@ -447,7 +556,6 @@ GrabGunToggle.MouseButton1Click:Connect(function()
     GrabGunToggle.BackgroundColor3=GrabGun_Enabled and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
     GrabGunToggle.Text=GrabGun_Enabled and"ON"or"OFF"
     if GrabGun_Enabled then
-        -- Забрать пистолет у шерифа
         pcall(function()
             for _,p in pairs(P:GetPlayers())do
                 if p~=L then
@@ -569,7 +677,6 @@ VisualSF.CanvasSize=UDim2.new(0,0,0,300)
 -- ============ FLING ============
 local FlingSF=MM2TabFrames.Fling
 
--- Список игроков
 local FlingPlayerList=Instance.new("ScrollingFrame")
 FlingPlayerList.Size=UDim2.new(1,-10,0,280)
 FlingPlayerList.Position=UDim2.new(0,5,0,5)
@@ -622,7 +729,6 @@ local function RefreshFlingList()
 end
 RefreshFlingList()
 
--- Кнопка Murderer за карту
 local FlingMurdererBtn=Instance.new("TextButton")
 FlingMurdererBtn.Size=UDim2.new(1,-10,0,40)
 FlingMurdererBtn.Position=UDim2.new(0,5,0,295)
@@ -645,7 +751,6 @@ FlingMurdererBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
--- Кнопка Sheriff за карту
 local FlingSheriffBtn=Instance.new("TextButton")
 FlingSheriffBtn.Size=UDim2.new(1,-10,0,40)
 FlingSheriffBtn.Position=UDim2.new(0,5,0,340)
@@ -726,106 +831,18 @@ MM2TabFrames.Combat.Visible=true
 MM2TabButtons.Combat.BackgroundColor3=Color3.fromRGB(60,100,200)
 MM2TabButtons.Combat.TextColor3=Color3.fromRGB(255,255,255)
 
--- ============ ROLES ============
-function getRole(p)
-    if p.Character then
-        for _,child in pairs(p.Character:GetChildren())do
-            if child:IsA("Tool")then
-                local n=child.Name:lower()
-                if n:find("knife")or n:find("murder")then return"Murderer"end
-                if n:find("gun")or n:find("pistol")or n:find("sheriff")then return"Sheriff"end
-            end
-        end
+-- ============ ESP 24/7 LOOP ============
+-- Отдельный цикл ТОЛЬКО для ESP чтобы работал всегда
+task.spawn(function()
+    while true do
+        UpdateESP()
+        task.wait(0.1) -- 10 раз в секунду для FPS оптимизации
     end
-    local bp=p:FindFirstChild("Backpack")
-    if bp then
-        for _,child in pairs(bp:GetChildren())do
-            if child:IsA("Tool")then
-                local n=child.Name:lower()
-                if n:find("knife")or n:find("murder")then return"Murderer"end
-                if n:find("gun")or n:find("pistol")or n:find("sheriff")then return"Sheriff"end
-            end
-        end
-    end
-    return"Innocent"
-end
+end)
 
--- ============ LOGIC ============
+-- Основной RenderStepped для остального
 R.RenderStepped:Connect(function()
     pcall(function()
-        -- ESP (Persistent - не пропадает)
-        if ESP_Enabled or ESP_Murderer or ESP_Sheriff or ESP_Innocent then
-            for _,p in pairs(P:GetPlayers())do
-                if p~=L and p.Character and p.Character:FindFirstChild("Head")then
-                    local role=getRole(p)
-                    local show=false
-                    local color=Color3.fromRGB(0,255,100)
-                    if ESP_Enabled then show=true;color=Color3.fromRGB(100,180,255)end
-                    if role=="Murderer"and ESP_Murderer then show=true;color=Color3.fromRGB(255,50,50)end
-                    if role=="Sheriff"and ESP_Sheriff then show=true;color=Color3.fromRGB(50,100,255)end
-                    if role=="Innocent"and ESP_Innocent then show=true;color=Color3.fromRGB(0,255,100)end
-                    
-                    if show then
-                        local existing=EspHighlights[p]
-                        if not existing or not existing.Parent then
-                            existing=Instance.new("Highlight")
-                            existing.FillColor=color
-                            existing.FillTransparency=.5
-                            existing.Parent=p.Character
-                            EspHighlights[p]=existing
-                        else
-                            existing.FillColor=color
-                            if not existing.Parent then existing.Parent=p.Character end
-                        end
-                    elseif EspHighlights[p]and EspHighlights[p].Parent then
-                        EspHighlights[p]:Destroy()
-                        EspHighlights[p]=nil
-                    end
-                end
-            end
-        else
-            for p,h in pairs(EspHighlights)do if h and h.Parent then h:Destroy()end end
-            EspHighlights={}
-        end
-        
-        -- Boxes (Persistent)
-        if Boxes_Enabled or Boxes_Murderer or Boxes_Sheriff or Boxes_Innocent then
-            for _,p in pairs(P:GetPlayers())do
-                if p~=L and p.Character and p.Character:FindFirstChild("Head")then
-                    local role=getRole(p)
-                    local show=false
-                    local color=Color3.fromRGB(0,255,100)
-                    if Boxes_Enabled then show=true;color=Color3.fromRGB(100,180,255)end
-                    if role=="Murderer"and Boxes_Murderer then show=true;color=Color3.fromRGB(255,50,50)end
-                    if role=="Sheriff"and Boxes_Sheriff then show=true;color=Color3.fromRGB(50,100,255)end
-                    if role=="Innocent"and Boxes_Innocent then show=true;color=Color3.fromRGB(0,255,100)end
-                    
-                    if show then
-                        local existing=EspBoxes[p]
-                        if not existing or not existing.Parent then
-                            local box=Instance.new("Highlight")
-                            box.FillColor=color
-                            box.OutlineColor=color
-                            box.FillTransparency=0.7
-                            box.OutlineTransparency=0
-                            box.Parent=p.Character
-                            EspBoxes[p]=box
-                        else
-                            existing.FillColor=color
-                            existing.OutlineColor=color
-                            if not existing.Parent then existing.Parent=p.Character end
-                        end
-                    elseif EspBoxes[p]and EspBoxes[p].Parent then
-                        EspBoxes[p]:Destroy()
-                        EspBoxes[p]=nil
-                    end
-                end
-            end
-        else
-            for p,b in pairs(EspBoxes)do if b and b.Parent then b:Destroy()end end
-            EspBoxes={}
-        end
-        
         -- Aimbot
         if Aimbot_Enabled and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
             local target=nil
@@ -977,27 +994,4 @@ TopBarText.InputBegan:Connect(function(i)
     end
 end)
 
--- TopBar drag
-local topDragging=false
-local topStart=nil
-local topPos=nil
-TopBar.InputBegan:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 then
-        topDragging=true
-        topStart=i.Position
-        topPos=TopBar.Position
-    end
-end)
-U.InputEnded:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 then
-        topDragging=false
-    end
-end)
-U.InputChanged:Connect(function(i)
-    if topDragging and i.UserInputType==Enum.UserInputType.MouseMovement then
-        local d=i.Position-topStart
-        TopBar.Position=UDim2.new(topPos.X.Scale,topPos.X.Offset+d.X,topPos.Y.Scale,topPos.Y.Offset+d.Y)
-    end
-end)
-
-Notify("SYPHIX HUB loaded!")
+Notify("SYPHIX HUB loaded! ESP works 24/7")
