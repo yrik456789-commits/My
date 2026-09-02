@@ -1,6 +1,7 @@
--- SYPHIX HUB | v16 | Fling FIXED (Real Working)
+-- SYPHIX HUB | v17 | Neon Style + All Fixed
 local P,R,U,T,C,L=game:GetService("Players"),game:GetService("RunService"),game:GetService("UserInputService"),game:GetService("TweenService"),workspace.CurrentCamera,game:GetService("Players").LocalPlayer
 local VU=game:GetService("VirtualUser")
+local Lighting=game:GetService("Lighting")
 
 local function GetHui()
     pcall(function()if gethui then return gethui()end end)
@@ -11,7 +12,7 @@ end
 local function Notify(text)
     pcall(function()
         local N=Instance.new("TextLabel")N.Size=UDim2.new(0,220,0,35)N.Position=UDim2.new(1,240,0,15)
-        N.BackgroundColor3=Color3.fromRGB(15,15,30)N.TextColor3=Color3.fromRGB(255,200,50)N.Text=text
+        N.BackgroundColor3=Color3.fromRGB(10,10,20)N.TextColor3=Color3.fromRGB(0,255,255)N.Text=text
         N.Font=Enum.Font.GothamBold N.TextSize=12 N.Parent=GetHui()
         Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=N
         task.wait(1.5)
@@ -30,10 +31,16 @@ local Boxes_Sheriff=false
 local Boxes_Innocent=false
 local Aimbot_Enabled=false
 local KillAll_Enabled=false
+local Spin_Enabled=false
+local SpinSpeed=10
+local AntiFling_Enabled=false
+local Tracer_Enabled=false
+local TracerColor=Color3.fromRGB(0,255,255)
 local Whitelist={}
 local HideKey="LeftAlt"
 local EspHighlights={}
 local EspBoxes={}
+local TracerLines={}
 
 function getRole(p)
     if not p then return"Innocent"end
@@ -42,7 +49,7 @@ function getRole(p)
             if child:IsA("Tool")then
                 local n=child.Name:lower()
                 if n:find("knife")or n:find("murder")or n:find("blade")then return"Murderer"end
-                if n:find("gun")or n:find("pistol")or n:find("revolver")or n:find("sheriff")then return"Sheriff"end
+                if n:find("gun")or n:find("pistol")or n:find("revolver")then return"Sheriff"end
             end
         end
     end
@@ -52,94 +59,40 @@ function getRole(p)
             if child:IsA("Tool")then
                 local n=child.Name:lower()
                 if n:find("knife")or n:find("murder")or n:find("blade")then return"Murderer"end
-                if n:find("gun")or n:find("pistol")or n:find("revolver")or n:find("sheriff")then return"Sheriff"end
+                if n:find("gun")or n:find("pistol")or n:find("revolver")then return"Sheriff"end
             end
         end
     end
     return"Innocent"
 end
 
--- ============ НАСТОЯЩИЙ ФЛИНГ ============
-local function RealFling(targetPlayer)
-    pcall(function()
-        if not targetPlayer then return end
-        local char=targetPlayer.Character
-        if not char then return end
-        
-        local hrp=char:FindFirstChild("HumanoidRootPart")
-        local hum=char:FindFirstChild("Humanoid")
-        
-        if not hrp then return end
-        
-        -- Метод 1: Отключаем PlatformStand
-        if hum then
-            hum.PlatformStand=true
-            hum.Sit=false
-        end
-        
-        -- Метод 2: Телепорт вверх
-        hrp.CFrame=hrp.CFrame+Vector3.new(0,100,0)
-        
-        -- Метод 3: Мощный Velocity
-        hrp.Velocity=Vector3.new(math.random(-20000,20000),25000,math.random(-20000,20000))
-        hrp.RotVelocity=Vector3.new(math.random(-1000,1000),math.random(-1000,1000),math.random(-1000,1000))
-        
-        -- Метод 4: Повторные импульсы
-        task.delay(0.1,function()
-            pcall(function()
-                if hrp and hrp.Parent then
-                    hrp.Velocity=Vector3.new(math.random(-30000,30000),40000,math.random(-30000,30000))
-                    hrp.RotVelocity=Vector3.new(math.random(-2000,2000),math.random(-2000,2000),math.random(-2000,2000))
-                end
-            end)
-        end)
-        
-        task.delay(0.3,function()
-            pcall(function()
-                if hrp and hrp.Parent then
-                    hrp.Velocity=Vector3.new(math.random(-40000,40000),60000,math.random(-40000,40000))
-                    hrp.RotVelocity=Vector3.new(math.random(-3000,3000),math.random(-3000,3000),math.random(-3000,3000))
-                end
-            end)
-        end)
-        
-        -- Метод 5: Телепорт за карту через 1 сек
-        task.delay(1,function()
-            pcall(function()
-                if hrp and hrp.Parent then
-                    hrp.CFrame=CFrame.new(math.random(-2000,2000),-500,math.random(-2000,2000))
-                    hrp.Velocity=Vector3.new(0,0,0)
-                    hrp.RotVelocity=Vector3.new(0,0,0)
-                end
-                if hum then
-                    hum.PlatformStand=false
-                end
-            end)
-        end)
-        
-        Notify("РВАНУЛ "..targetPlayer.Name)
-    end)
-end
-
--- ============ ESP 24/7 ============
+-- ============ ESP 24/7 РЕАЛЬНОГО ВРЕМЕНИ ============
 local function UpdateESP()
     pcall(function()
+        -- Очистка
         for p,h in pairs(EspHighlights)do
             if not h or not h.Parent or not p or not p.Parent then
                 if h then pcall(function()h:Destroy()end)end
                 EspHighlights[p]=nil
             end
         end
+        for p,h in pairs(EspBoxes)do
+            if not h or not h.Parent or not p or not p.Parent then
+                if h then pcall(function()h:Destroy()end)end
+                EspBoxes[p]=nil
+            end
+        end
         
+        -- ESP для ВСЕХ игроков включая новых
         if ESP_Enabled or ESP_Murderer or ESP_Sheriff or ESP_Innocent then
             for _,p in pairs(P:GetPlayers())do
                 if p~=L and p.Character and p.Character:FindFirstChild("Head")then
                     local role=getRole(p)
                     local show=false
-                    local color=Color3.fromRGB(100,180,255)
+                    local color=Color3.fromRGB(0,255,255)
                     if ESP_Enabled then show=true end
-                    if role=="Murderer"and ESP_Murderer then show=true;color=Color3.fromRGB(255,50,50)end
-                    if role=="Sheriff"and ESP_Sheriff then show=true;color=Color3.fromRGB(50,100,255)end
+                    if role=="Murderer"and ESP_Murderer then show=true;color=Color3.fromRGB(255,0,255)end
+                    if role=="Sheriff"and ESP_Sheriff then show=true;color=Color3.fromRGB(0,100,255)end
                     if role=="Innocent"and ESP_Innocent then show=true;color=Color3.fromRGB(0,255,100)end
                     
                     if show then
@@ -173,22 +126,16 @@ local function UpdateESP()
             end
         end
         
-        for p,h in pairs(EspBoxes)do
-            if not h or not h.Parent or not p or not p.Parent then
-                if h then pcall(function()h:Destroy()end)end
-                EspBoxes[p]=nil
-            end
-        end
-        
+        -- Boxes
         if Boxes_Enabled or Boxes_Murderer or Boxes_Sheriff or Boxes_Innocent then
             for _,p in pairs(P:GetPlayers())do
                 if p~=L and p.Character and p.Character:FindFirstChild("Head")then
                     local role=getRole(p)
                     local show=false
-                    local color=Color3.fromRGB(100,180,255)
+                    local color=Color3.fromRGB(0,255,255)
                     if Boxes_Enabled then show=true end
-                    if role=="Murderer"and Boxes_Murderer then show=true;color=Color3.fromRGB(255,50,50)end
-                    if role=="Sheriff"and Boxes_Sheriff then show=true;color=Color3.fromRGB(50,100,255)end
+                    if role=="Murderer"and Boxes_Murderer then show=true;color=Color3.fromRGB(255,0,255)end
+                    if role=="Sheriff"and Boxes_Sheriff then show=true;color=Color3.fromRGB(0,100,255)end
                     if role=="Innocent"and Boxes_Innocent then show=true;color=Color3.fromRGB(0,255,100)end
                     
                     if show then
@@ -223,30 +170,221 @@ local function UpdateESP()
     end)
 end
 
+-- Обновление ESP КАЖДЫЙ КАДР (реальное время)
+R.RenderStepped:Connect(function()
+    UpdateESP()
+end)
+
+-- ============ TRACER ПУЛЬ ============
+local function CreateBulletTracer(startPos,endPos)
+    pcall(function()
+        local line=Drawing.new("Line")
+        line.Color=TracerColor
+        line.Thickness=3
+        line.Transparency=0
+        line.From=Vector2.new(startPos.X,startPos.Y)
+        line.To=Vector2.new(endPos.X,endPos.Y)
+        line.Visible=true
+        
+        -- Неоновая толщина
+        task.spawn(function()
+            for i=1,40 do
+                task.wait(0.1)
+                pcall(function()
+                    line.Transparency=i/40
+                    line.Thickness=math.max(1,3-(i/20))
+                end)
+            end
+            pcall(function()line:Remove()end)
+        end)
+    end)
+end
+
+-- Отслеживание выстрелов
+local lastMousePos=Vector2.new(0,0)
+local lastFireTime=0
+
 task.spawn(function()
     while true do
-        UpdateESP()
-        task.wait(0.1)
+        pcall(function()
+            if Tracer_Enabled and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
+                local hrp=L.Character.HumanoidRootPart
+                local mousePos=U:GetMouseLocation()
+                
+                -- Проверка на выстрел (клик)
+                if U:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)and tick()-lastFireTime>0.5 then
+                    lastFireTime=tick()
+                    
+                    local startScreen=C:WorldToScreenPoint(hrp.Position)
+                    local ray=C:ScreenPointToRay(mousePos.X,mousePos.Y,1000)
+                    local endScreen=C:WorldToScreenPoint(ray.Origin+ray.Direction*500)
+                    
+                    if startScreen and endScreen then
+                        CreateBulletTracer(
+                            Vector2.new(startScreen.X,startScreen.Y),
+                            Vector2.new(endScreen.X,endScreen.Y)
+                        )
+                    end
+                end
+            end
+        end)
+        task.wait(0.05)
     end
 end)
 
--- ============ ЛАУНЧЕР ============
+-- ============ ФЛИНГ (РЕАЛЬНЫЙ) ============
+local function RealFling(targetPlayer)
+    pcall(function()
+        if not targetPlayer then return end
+        local char=targetPlayer.Character
+        if not char then return end
+        local hrp=char:FindFirstChild("HumanoidRootPart")
+        local hum=char:FindFirstChild("Humanoid")
+        if not hrp then return end
+        
+        -- Отключаем PlatformStand
+        if hum then
+            hum.PlatformStand=true
+            hum.Sit=false
+            hum:ChangeState(Enum.HumanoidStateType.Physics)
+        end
+        
+        -- CFrame телепорт
+        hrp.CFrame=hrp.CFrame+Vector3.new(0,100,0)
+        
+        -- Мощный импульс
+        hrp.Velocity=Vector3.new(math.random(-30000,30000),50000,math.random(-30000,30000))
+        hrp.RotVelocity=Vector3.new(math.random(-2000,2000),math.random(-2000,2000),math.random(-2000,2000))
+        
+        -- Повторные импульсы
+        task.delay(0.1,function()
+            pcall(function()
+                if hrp and hrp.Parent then
+                    hrp.Velocity=Vector3.new(math.random(-40000,40000),70000,math.random(-40000,40000))
+                end
+            end)
+        end)
+        
+        task.delay(0.3,function()
+            pcall(function()
+                if hrp and hrp.Parent then
+                    hrp.Velocity=Vector3.new(math.random(-50000,50000),100000,math.random(-50000,50000))
+                end
+            end)
+        end)
+        
+        -- Телепорт за карту
+        task.delay(1,function()
+            pcall(function()
+                if hrp and hrp.Parent then
+                    hrp.CFrame=CFrame.new(0,-2000,0)
+                    hrp.Velocity=Vector3.new(0,0,0)
+                    hrp.RotVelocity=Vector3.new(0,0,0)
+                end
+                if hum then hum.PlatformStand=false end
+            end)
+        end)
+        
+        Notify("РВАНУЛ "..targetPlayer.Name)
+    end)
+end
+
+-- ============ GRAB GUN (РЕАЛЬНЫЙ) ============
+local function GrabGun()
+    pcall(function()
+        for _,p in pairs(P:GetPlayers())do
+            if p~=L then
+                -- Ищем пистолет у шерифа
+                if getRole(p)=="Sheriff"then
+                    local char=p.Character
+                    local bp=p:FindFirstChild("Backpack")
+                    
+                    -- В Character
+                    if char then
+                        for _,child in pairs(char:GetChildren())do
+                            if child:IsA("Tool")and(child.Name:lower():find("gun")or child.Name:lower():find("pistol"))then
+                                child.Parent=L.Backpack or L.Character
+                                Notify("Gun grabbed!")
+                                return
+                            end
+                        end
+                    end
+                    
+                    -- В Backpack
+                    if bp then
+                        for _,child in pairs(bp:GetChildren())do
+                            if child:IsA("Tool")and(child.Name:lower():find("gun")or child.Name:lower():find("pistol"))then
+                                child.Parent=L.Backpack or L.Character
+                                Notify("Gun grabbed!")
+                                return
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        Notify("Gun not found")
+    end)
+end
+
+-- ============ АНТИ-ФЛИНГ (РЕАЛЬНЫЙ) ============
+local function ApplyAntiFling()
+    pcall(function()
+        if not L.Character then return end
+        local hrp=L.Character:FindFirstChild("HumanoidRootPart")
+        local hum=L.Character:FindFirstChild("Humanoid")
+        if not hrp then return end
+        
+        -- Проверка на подозрительную скорость
+        if hrp.Velocity.Magnitude>200 or hrp.RotVelocity.Magnitude>100 then
+            -- Нейтрализация
+            hrp.Velocity=Vector3.new(0,0,0)
+            hrp.RotVelocity=Vector3.new(0,0,0)
+            -- Отключение коллизии на 0.5 сек
+            if hum then
+                hum.PlatformStand=true
+                task.delay(0.5,function()
+                    pcall(function()
+                        if hum then hum.PlatformStand=false end
+                    end)
+                end)
+            end
+            -- Корректировка позиции
+            hrp.CFrame=hrp.CFrame+Vector3.new(0,-5,0)
+        end
+    end)
+end
+
+-- ============ НЕОНОВЫЙ GUI ============
 local LG=Instance.new("ScreenGui")LG.Name="Launcher"LG.Parent=GetHui()
 
+-- TopBar с неоном
 local TopBar=Instance.new("Frame")
 TopBar.Size=UDim2.new(0,200,0,40)
 TopBar.Position=UDim2.new(.5,-100,0,10)
-TopBar.BackgroundColor3=Color3.fromRGB(15,15,30)
+TopBar.BackgroundColor3=Color3.fromRGB(10,10,20)
 TopBar.BorderSizePixel=0
 TopBar.Parent=LG
 Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=TopBar
+
+-- Неоновая рамка
+local NeonBorder=Instance.new("Frame")
+NeonBorder.Size=UDim2.new(1,6,1,6)
+NeonBorder.Position=UDim2.new(0,-3,0,-3)
+NeonBorder.BackgroundColor3=Color3.fromRGB(0,255,255)
+NeonBorder.BackgroundTransparency=0.3
+NeonBorder.BorderSizePixel=0
+NeonBorder.ZIndex=0
+NeonBorder.Parent=TopBar
+Instance.new("UICorner").CornerRadius=UDim.new(0,15)Instance.new("UICorner").Parent=NeonBorder
+TopBar.ZIndex=1
 
 local TopBarText=Instance.new("TextLabel")
 TopBarText.Size=UDim2.new(0,140,0,25)
 TopBarText.Position=UDim2.new(0,35,0,8)
 TopBarText.BackgroundTransparency=1
 TopBarText.Text="SYPHIX HUB"
-TopBarText.TextColor3=Color3.fromRGB(255,255,255)
+TopBarText.TextColor3=Color3.fromRGB(0,255,255)
 TopBarText.Font=Enum.Font.GothamBlack
 TopBarText.TextSize=13
 TopBarText.Parent=TopBar
@@ -254,9 +392,9 @@ TopBarText.Parent=TopBar
 local TopBarArrow=Instance.new("TextButton")
 TopBarArrow.Size=UDim2.new(0,25,0,25)
 TopBarArrow.Position=UDim2.new(1,-30,0,7)
-TopBarArrow.BackgroundColor3=Color3.fromRGB(60,100,200)
+TopBarArrow.BackgroundColor3=Color3.fromRGB(0,255,255)
 TopBarArrow.Text="v"
-TopBarArrow.TextColor3=Color3.fromRGB(255,255,255)
+TopBarArrow.TextColor3=Color3.fromRGB(10,10,20)
 TopBarArrow.Font=Enum.Font.GothamBold
 TopBarArrow.TextSize=12
 TopBarArrow.Parent=TopBar
@@ -265,7 +403,7 @@ Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Pare
 local LauncherMenu=Instance.new("Frame")
 LauncherMenu.Size=UDim2.new(0,0,0,0)
 LauncherMenu.Position=UDim2.new(.5,0,0,55)
-LauncherMenu.BackgroundColor3=Color3.fromRGB(12,12,25)
+LauncherMenu.BackgroundColor3=Color3.fromRGB(10,10,20)
 LauncherMenu.BorderSizePixel=0
 LauncherMenu.BackgroundTransparency=1
 LauncherMenu.ClipsDescendants=true
@@ -283,7 +421,7 @@ LauncherContent.Parent=LauncherMenu
 local MM2Card=Instance.new("TextButton")
 MM2Card.Size=UDim2.new(1,0,0,45)
 MM2Card.Position=UDim2.new(0,0,0,5)
-MM2Card.BackgroundColor3=Color3.fromRGB(18,18,35)
+MM2Card.BackgroundColor3=Color3.fromRGB(15,15,30)
 MM2Card.Text=""
 MM2Card.Parent=LauncherContent
 Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=MM2Card
@@ -293,7 +431,7 @@ MM2Name.Size=UDim2.new(1,-80,1,0)
 MM2Name.Position=UDim2.new(0,50,0,0)
 MM2Name.BackgroundTransparency=1
 MM2Name.Text="Murder Mystery 2"
-MM2Name.TextColor3=Color3.fromRGB(255,255,255)
+MM2Name.TextColor3=Color3.fromRGB(255,0,255)
 MM2Name.Font=Enum.Font.GothamBold
 MM2Name.TextSize=13
 MM2Name.TextXAlignment=Enum.TextXAlignment.Left
@@ -302,9 +440,9 @@ MM2Name.Parent=MM2Card
 local MM2Execute=Instance.new("TextButton")
 MM2Execute.Size=UDim2.new(0,70,0,30)
 MM2Execute.Position=UDim2.new(1,-75,0,7)
-MM2Execute.BackgroundColor3=Color3.fromRGB(60,200,100)
+MM2Execute.BackgroundColor3=Color3.fromRGB(0,255,100)
 MM2Execute.Text="EXECUTE"
-MM2Execute.TextColor3=Color3.fromRGB(15,15,25)
+MM2Execute.TextColor3=Color3.fromRGB(10,10,20)
 MM2Execute.Font=Enum.Font.GothamBlack
 MM2Execute.TextSize=9
 MM2Execute.ZIndex=2
@@ -320,17 +458,28 @@ MG.Enabled=false
 local MM2Bar=Instance.new("Frame")
 MM2Bar.Size=UDim2.new(0,180,0,40)
 MM2Bar.Position=UDim2.new(.5,-90,0,10)
-MM2Bar.BackgroundColor3=Color3.fromRGB(15,15,30)
+MM2Bar.BackgroundColor3=Color3.fromRGB(10,10,20)
 MM2Bar.BorderSizePixel=0
 MM2Bar.Parent=MG
 Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=MM2Bar
+
+local MM2NeonBorder=Instance.new("Frame")
+MM2NeonBorder.Size=UDim2.new(1,6,1,6)
+MM2NeonBorder.Position=UDim2.new(0,-3,0,-3)
+MM2NeonBorder.BackgroundColor3=Color3.fromRGB(255,0,255)
+MM2NeonBorder.BackgroundTransparency=0.3
+MM2NeonBorder.BorderSizePixel=0
+MM2NeonBorder.ZIndex=0
+MM2NeonBorder.Parent=MM2Bar
+Instance.new("UICorner").CornerRadius=UDim.new(0,15)Instance.new("UICorner").Parent=MM2NeonBorder
+MM2Bar.ZIndex=1
 
 local MM2BarText=Instance.new("TextLabel")
 MM2BarText.Size=UDim2.new(0,120,0,25)
 MM2BarText.Position=UDim2.new(0,10,0,8)
 MM2BarText.BackgroundTransparency=1
 MM2BarText.Text="SYPHIX MM2"
-MM2BarText.TextColor3=Color3.fromRGB(255,100,100)
+MM2BarText.TextColor3=Color3.fromRGB(255,0,255)
 MM2BarText.Font=Enum.Font.GothamBlack
 MM2BarText.TextSize=13
 MM2BarText.Parent=MM2Bar
@@ -338,9 +487,9 @@ MM2BarText.Parent=MM2Bar
 local MM2BarArrow=Instance.new("TextButton")
 MM2BarArrow.Size=UDim2.new(0,25,0,25)
 MM2BarArrow.Position=UDim2.new(1,-30,0,7)
-MM2BarArrow.BackgroundColor3=Color3.fromRGB(255,80,80)
+MM2BarArrow.BackgroundColor3=Color3.fromRGB(255,0,255)
 MM2BarArrow.Text=">"
-MM2BarArrow.TextColor3=Color3.fromRGB(255,255,255)
+MM2BarArrow.TextColor3=Color3.fromRGB(10,10,20)
 MM2BarArrow.Font=Enum.Font.GothamBold
 MM2BarArrow.TextSize=12
 MM2BarArrow.Parent=MM2Bar
@@ -349,7 +498,7 @@ Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Pare
 local MM2Panel=Instance.new("Frame")
 MM2Panel.Size=UDim2.new(0,0,0,0)
 MM2Panel.Position=UDim2.new(.5,-262,.5,-262)
-MM2Panel.BackgroundColor3=Color3.fromRGB(12,12,25)
+MM2Panel.BackgroundColor3=Color3.fromRGB(10,10,20)
 MM2Panel.BorderSizePixel=0
 MM2Panel.BackgroundTransparency=1
 MM2Panel.ClipsDescendants=true
@@ -359,7 +508,7 @@ Instance.new("UICorner").CornerRadius=UDim.new(0,16)Instance.new("UICorner").Par
 
 local MM2Header=Instance.new("Frame")
 MM2Header.Size=UDim2.new(1,0,0,50)
-MM2Header.BackgroundColor3=Color3.fromRGB(18,18,35)
+MM2Header.BackgroundColor3=Color3.fromRGB(15,15,30)
 MM2Header.BorderSizePixel=0
 MM2Header.Parent=MM2Panel
 Instance.new("UICorner").CornerRadius=UDim.new(0,16)Instance.new("UICorner").Parent=MM2Header
@@ -369,7 +518,7 @@ MM2Title.Size=UDim2.new(0,200,0,30)
 MM2Title.Position=UDim2.new(0,15,0,10)
 MM2Title.BackgroundTransparency=1
 MM2Title.Text="SYPHIX MM2"
-MM2Title.TextColor3=Color3.fromRGB(255,100,100)
+MM2Title.TextColor3=Color3.fromRGB(255,0,255)
 MM2Title.Font=Enum.Font.GothamBlack
 MM2Title.TextSize=15
 MM2Title.Parent=MM2Header
@@ -377,7 +526,7 @@ MM2Title.Parent=MM2Header
 local MM2CloseBtn=Instance.new("TextButton")
 MM2CloseBtn.Size=UDim2.new(0,26,0,26)
 MM2CloseBtn.Position=UDim2.new(1,-32,0,12)
-MM2CloseBtn.BackgroundColor3=Color3.fromRGB(255,60,60)
+MM2CloseBtn.BackgroundColor3=Color3.fromRGB(255,0,100)
 MM2CloseBtn.Text="X"
 MM2CloseBtn.TextColor3=Color3.fromRGB(255,255,255)
 MM2CloseBtn.Font=Enum.Font.GothamBold
@@ -388,7 +537,7 @@ Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Pare
 local MM2Tabs=Instance.new("Frame")
 MM2Tabs.Size=UDim2.new(0,120,1,-50)
 MM2Tabs.Position=UDim2.new(0,0,0,50)
-MM2Tabs.BackgroundColor3=Color3.fromRGB(15,15,28)
+MM2Tabs.BackgroundColor3=Color3.fromRGB(12,12,25)
 MM2Tabs.BorderSizePixel=0
 MM2Tabs.Parent=MM2Panel
 
@@ -416,17 +565,17 @@ for i=1,4 do
     local b=Instance.new("TextButton")
     b.Size=UDim2.new(1,-10,0,50)
     b.Position=UDim2.new(0,5,0,5+(i-1)*55)
-    b.BackgroundColor3=Color3.fromRGB(20,20,38)
+    b.BackgroundColor3=Color3.fromRGB(15,15,30)
     b.Text=name
-    b.TextColor3=Color3.fromRGB(120,140,180)
+    b.TextColor3=Color3.fromRGB(0,255,255)
     b.Font=Enum.Font.GothamBold
     b.TextSize=11
     b.Parent=MM2Tabs
     Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
     b.MouseButton1Click:Connect(function()
         for n,btn in pairs(MM2TabButtons)do
-            btn.BackgroundColor3=n==name and Color3.fromRGB(60,100,200)or Color3.fromRGB(20,20,38)
-            btn.TextColor3=n==name and Color3.fromRGB(255,255,255)or Color3.fromRGB(120,140,180)
+            btn.BackgroundColor3=n==name and Color3.fromRGB(0,255,255)or Color3.fromRGB(15,15,30)
+            btn.TextColor3=n==name and Color3.fromRGB(10,10,20)or Color3.fromRGB(0,255,255)
         end
         for n,f in pairs(MM2TabFrames)do f.Visible=n==name end
     end)
@@ -438,49 +587,49 @@ local CombatSF=MM2TabFrames.Combat
 
 local function mkToggleWithSub(parent,name,y,subContent,subHeight,onToggle)
     local mainFrame=Instance.new("Frame")
-    mainFrame.Size=UDim2.new(1,-10,0,40)
+    mainFrame.Size=UDim2.new(1,-10,0,38)
     mainFrame.Position=UDim2.new(0,5,0,y)
-    mainFrame.BackgroundColor3=Color3.fromRGB(20,20,38)
+    mainFrame.BackgroundColor3=Color3.fromRGB(15,15,30)
     mainFrame.BorderSizePixel=0
     mainFrame.Parent=parent
     Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=mainFrame
     
     local label=Instance.new("TextLabel")
     label.Size=UDim2.new(.55,0,1,0)
-    label.Position=UDim2.new(0,10,0,0)
+    label.Position=UDim2.new(0,9,0,0)
     label.BackgroundTransparency=1
     label.Text=name
-    label.TextColor3=Color3.fromRGB(200,220,255)
+    label.TextColor3=Color3.fromRGB(0,255,255)
     label.Font=Enum.Font.Gotham
     label.TextSize=12
     label.Parent=mainFrame
     
     local toggle=Instance.new("TextButton")
-    toggle.Size=UDim2.new(0,55,0,25)
-    toggle.Position=UDim2.new(1,-100,0,7)
-    toggle.BackgroundColor3=Color3.fromRGB(40,40,70)
+    toggle.Size=UDim2.new(0,50,0,22)
+    toggle.Position=UDim2.new(1,-95,0,8)
+    toggle.BackgroundColor3=Color3.fromRGB(30,30,50)
     toggle.Text="OFF"
     toggle.TextColor3=Color3.fromRGB(150,170,200)
     toggle.Font=Enum.Font.GothamBold
     toggle.TextSize=9
     toggle.Parent=mainFrame
-    Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=toggle
+    Instance.new("UICorner").CornerRadius=UDim.new(0,11)Instance.new("UICorner").Parent=toggle
     
     local expand=Instance.new("TextButton")
-    expand.Size=UDim2.new(0,25,0,25)
-    expand.Position=UDim2.new(1,-35,0,7)
-    expand.BackgroundColor3=Color3.fromRGB(60,100,200)
+    expand.Size=UDim2.new(0,22,0,22)
+    expand.Position=UDim2.new(1,-32,0,8)
+    expand.BackgroundColor3=Color3.fromRGB(0,255,255)
     expand.Text=">"
-    expand.TextColor3=Color3.fromRGB(255,255,255)
+    expand.TextColor3=Color3.fromRGB(10,10,20)
     expand.Font=Enum.Font.GothamBold
-    expand.TextSize=12
+    expand.TextSize=11
     expand.Parent=mainFrame
-    Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=expand
+    Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=expand
     
     local submenu=Instance.new("Frame")
     submenu.Size=UDim2.new(1,-10,0,0)
-    submenu.Position=UDim2.new(0,5,0,y+43)
-    submenu.BackgroundColor3=Color3.fromRGB(25,25,45)
+    submenu.Position=UDim2.new(0,5,0,y+41)
+    submenu.BackgroundColor3=Color3.fromRGB(20,20,40)
     submenu.BorderSizePixel=0
     submenu.ClipsDescendants=true
     submenu.Parent=parent
@@ -502,29 +651,31 @@ local function mkToggleWithSub(parent,name,y,subContent,subHeight,onToggle)
     
     toggle.MouseButton1Click:Connect(function()
         local state=not(toggle.Text=="ON")
-        toggle.BackgroundColor3=state and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
+        toggle.BackgroundColor3=state and Color3.fromRGB(0,255,100)or Color3.fromRGB(30,30,50)
         toggle.Text=state and"ON"or"OFF"
         if onToggle then onToggle(state)end
     end)
 end
 
+-- Aimbot (компактный)
 mkToggleWithSub(CombatSF,"Aimbot",5,function(sub)
     local info=Instance.new("TextLabel")
     info.Size=UDim2.new(1,0,0,25)
     info.Position=UDim2.new(0,5,0,5)
     info.BackgroundTransparency=1
-    info.Text="Always targets Murderer"
-    info.TextColor3=Color3.fromRGB(255,100,100)
+    info.Text="Targets Murderer"
+    info.TextColor3=Color3.fromRGB(255,0,255)
     info.Font=Enum.Font.Gotham
     info.TextSize=11
     info.Parent=sub
-end,80,function(state)Aimbot_Enabled=state end)
+end,60,function(state)Aimbot_Enabled=state end)
 
-mkToggleWithSub(CombatSF,"Kill All",130,function(sub)
+-- Kill All (компактный)
+mkToggleWithSub(CombatSF,"Kill All",48,function(sub)
     local wl=Instance.new("ScrollingFrame")
-    wl.Size=UDim2.new(1,-10,0,200)
-    wl.Position=UDim2.new(0,5,0,30)
-    wl.BackgroundColor3=Color3.fromRGB(18,18,30)
+    wl.Size=UDim2.new(1,-10,0,150)
+    wl.Position=UDim2.new(0,5,0,5)
+    wl.BackgroundColor3=Color3.fromRGB(15,15,25)
     wl.BorderSizePixel=0
     wl.Parent=sub
     Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=wl
@@ -537,164 +688,217 @@ mkToggleWithSub(CombatSF,"Kill All",130,function(sub)
                 if p~=L then
                     local isW=Whitelist[p.Name]
                     local b=Instance.new("TextButton")
-                    b.Size=UDim2.new(1,-10,0,28)
+                    b.Size=UDim2.new(1,-10,0,25)
                     b.Position=UDim2.new(0,5,0,y)
-                    b.BackgroundColor3=isW and Color3.fromRGB(50,200,100)or Color3.fromRGB(30,30,50)
+                    b.BackgroundColor3=isW and Color3.fromRGB(0,255,100)or Color3.fromRGB(20,20,35)
                     b.Text=p.Name
-                    b.TextColor3=isW and Color3.fromRGB(15,15,25)or Color3.fromRGB(200,220,255)
+                    b.TextColor3=isW and Color3.fromRGB(10,10,20)or Color3.fromRGB(0,255,255)
                     b.Font=Enum.Font.GothamBold
-                    b.TextSize=10
+                    b.TextSize=9
                     b.Parent=wl
                     Instance.new("UICorner").CornerRadius=UDim.new(0,4)Instance.new("UICorner").Parent=b
                     b.MouseButton1Click:Connect(function()
                         if Whitelist[p.Name]then Whitelist[p.Name]=nil else Whitelist[p.Name]=true end
                         refreshWL()
                     end)
-                    y+=32
+                    y+=29
                 end
             end
             wl.CanvasSize=UDim2.new(0,0,0,y)
         end)
     end
     refreshWL()
-end,240,function(state)KillAll_Enabled=state end)
+end,160,function(state)KillAll_Enabled=state end)
+
+-- Spin (с подменю скорости)
+mkToggleWithSub(CombatSF,"Spin",215,function(sub)
+    local speedLabel=Instance.new("TextLabel")
+    speedLabel.Size=UDim2.new(1,0,0,20)
+    speedLabel.Position=UDim2.new(0,5,0,5)
+    speedLabel.BackgroundTransparency=1
+    speedLabel.Text="Speed: "..SpinSpeed
+    speedLabel.TextColor3=Color3.fromRGB(0,255,255)
+    speedLabel.Font=Enum.Font.Gotham
+    speedLabel.TextSize=11
+    speedLabel.Parent=sub
+    
+    local speedSlider=Instance.new("TextButton")
+    speedSlider.Size=UDim2.new(1,-20,0,8)
+    speedSlider.Position=UDim2.new(0,10,0,30)
+    speedSlider.BackgroundColor3=Color3.fromRGB(30,30,50)
+    speedSlider.Text=""
+    speedSlider.BorderSizePixel=0
+    speedSlider.Parent=sub
+    Instance.new("UICorner").CornerRadius=UDim.new(1,0)Instance.new("UICorner").Parent=speedSlider
+    
+    local speedFill=Instance.new("Frame")
+    speedFill.Size=UDim2.new(SpinSpeed/50,0,1,0)
+    speedFill.BackgroundColor3=Color3.fromRGB(0,255,255)
+    speedFill.BorderSizePixel=0
+    speedFill.Parent=speedSlider
+    
+    speedSlider.MouseButton1Down:Connect(function()
+        local con
+        con=R.RenderStepped:Connect(function()
+            if U:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)then
+                local rel=math.clamp((U:GetMouseLocation().X-speedSlider.AbsolutePosition.X)/speedSlider.AbsoluteSize.X,0,1)
+                SpinSpeed=math.floor(rel*50)+1
+                speedLabel.Text="Speed: "..SpinSpeed
+                speedFill.Size=UDim2.new(rel,0,1,0)
+            else con:Disconnect()end
+        end)
+    end)
+end,50,function(state)Spin_Enabled=state end)
 
 -- Grab Gun
 local GrabGunFrame=Instance.new("Frame")
-GrabGunFrame.Size=UDim2.new(1,-10,0,40)
-GrabGunFrame.Position=UDim2.new(0,5,0,400)
-GrabGunFrame.BackgroundColor3=Color3.fromRGB(20,20,38)
+GrabGunFrame.Size=UDim2.new(1,-10,0,38)
+GrabGunFrame.Position=UDim2.new(0,5,0,270)
+GrabGunFrame.BackgroundColor3=Color3.fromRGB(15,15,30)
 GrabGunFrame.BorderSizePixel=0
 GrabGunFrame.Parent=CombatSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=GrabGunFrame
 
 local GrabGunLabel=Instance.new("TextLabel")
 GrabGunLabel.Size=UDim2.new(.55,0,1,0)
-GrabGunLabel.Position=UDim2.new(0,10,0,0)
+GrabGunLabel.Position=UDim2.new(0,9,0,0)
 GrabGunLabel.BackgroundTransparency=1
 GrabGunLabel.Text="Grab Gun"
-GrabGunLabel.TextColor3=Color3.fromRGB(200,220,255)
+GrabGunLabel.TextColor3=Color3.fromRGB(0,255,255)
 GrabGunLabel.Font=Enum.Font.Gotham
 GrabGunLabel.TextSize=12
 GrabGunLabel.Parent=GrabGunFrame
 
-local GrabGunToggle=Instance.new("TextButton")
-GrabGunToggle.Size=UDim2.new(0,55,0,25)
-GrabGunToggle.Position=UDim2.new(1,-60,0,7)
-GrabGunToggle.BackgroundColor3=Color3.fromRGB(40,40,70)
-GrabGunToggle.Text="OFF"
-GrabGunToggle.TextColor3=Color3.fromRGB(150,170,200)
-GrabGunToggle.Font=Enum.Font.GothamBold
-GrabGunToggle.TextSize=9
-GrabGunToggle.Parent=GrabGunFrame
-Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=GrabGunToggle
+local GrabGunBtn=Instance.new("TextButton")
+GrabGunBtn.Size=UDim2.new(0,50,0,22)
+GrabGunBtn.Position=UDim2.new(1,-55,0,8)
+GrabGunBtn.BackgroundColor3=Color3.fromRGB(0,255,255)
+GrabGunBtn.Text="GRAB"
+GrabGunBtn.TextColor3=Color3.fromRGB(10,10,20)
+GrabGunBtn.Font=Enum.Font.GothamBold
+GrabGunBtn.TextSize=9
+GrabGunBtn.Parent=GrabGunFrame
+Instance.new("UICorner").CornerRadius=UDim.new(0,11)Instance.new("UICorner").Parent=GrabGunBtn
 
-GrabGunToggle.MouseButton1Click:Connect(function()
-    pcall(function()
-        for _,p in pairs(P:GetPlayers())do
-            if p~=L then
-                local char=p.Character
-                if char then
-                    local gun=char:FindFirstChild("Gun")or char:FindFirstChild("Pistol")
-                    if gun then gun.Parent=L.Backpack or L.Character Notify("Gun grabbed!")return end
-                end
-                local bp=p:FindFirstChild("Backpack")
-                if bp then
-                    local gun2=bp:FindFirstChild("Gun")or bp:FindFirstChild("Pistol")
-                    if gun2 then gun2.Parent=L.Backpack or L.Character Notify("Gun grabbed!")return end
-                end
-            end
-        end
-        Notify("Gun not found")
-    end)
-end)
+GrabGunBtn.MouseButton1Click:Connect(GrabGun)
 
-CombatSF.CanvasSize=UDim2.new(0,0,0,450)
+CombatSF.CanvasSize=UDim2.new(0,0,0,320)
 
 -- ============ VISUAL ============
 local VisualSF=MM2TabFrames.Visual
 
+-- ESP
 mkToggleWithSub(VisualSF,"ESP",5,function(sub)
     local function mkRole(name,y,setter)
         local f=Instance.new("Frame")
-        f.Size=UDim2.new(1,-10,0,30)
+        f.Size=UDim2.new(1,-10,0,28)
         f.Position=UDim2.new(0,5,0,y)
-        f.BackgroundColor3=Color3.fromRGB(30,30,50)
+        f.BackgroundColor3=Color3.fromRGB(20,20,40)
         f.BorderSizePixel=0
         f.Parent=sub
         Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=f
         local l=Instance.new("TextLabel")
         l.Size=UDim2.new(.6,0,1,0)
-        l.Position=UDim2.new(0,7,0,0)
+        l.Position=UDim2.new(0,6,0,0)
         l.BackgroundTransparency=1
         l.Text=name
-        l.TextColor3=Color3.fromRGB(200,220,255)
+        l.TextColor3=Color3.fromRGB(0,255,255)
         l.Font=Enum.Font.Gotham
         l.TextSize=10
         l.Parent=f
         local b=Instance.new("TextButton")
-        b.Size=UDim2.new(0,45,0,20)
-        b.Position=UDim2.new(1,-50,0,5)
-        b.BackgroundColor3=Color3.fromRGB(40,40,70)
+        b.Size=UDim2.new(0,42,0,18)
+        b.Position=UDim2.new(1,-47,0,5)
+        b.BackgroundColor3=Color3.fromRGB(30,30,50)
         b.Text="OFF"
         b.TextColor3=Color3.fromRGB(150,170,200)
         b.Font=Enum.Font.GothamBold
-        b.TextSize=9
+        b.TextSize=8
         b.Parent=f
-        Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
+        Instance.new("UICorner").CornerRadius=UDim.new(0,9)Instance.new("UICorner").Parent=b
         b.MouseButton1Click:Connect(function()
             local st=not(b.Text=="ON")
-            b.BackgroundColor3=st and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
+            b.BackgroundColor3=st and Color3.fromRGB(0,255,100)or Color3.fromRGB(30,30,50)
             b.Text=st and"ON"or"OFF"
             setter(st)
         end)
     end
-    mkRole("Murderer (Red)",5,function(st)ESP_Murderer=st end)
-    mkRole("Sheriff (Blue)",38,function(st)ESP_Sheriff=st end)
-    mkRole("Innocent (Green)",71,function(st)ESP_Innocent=st end)
-end,110,function(state)ESP_Enabled=state end)
+    mkRole("Murderer",5,function(st)ESP_Murderer=st end)
+    mkRole("Sheriff",36,function(st)ESP_Sheriff=st end)
+    mkRole("Innocent",67,function(st)ESP_Innocent=st end)
+end,100,function(state)ESP_Enabled=state end)
 
-mkToggleWithSub(VisualSF,"Boxes",130,function(sub)
+-- Boxes
+mkToggleWithSub(VisualSF,"Boxes",110,function(sub)
     local function mkRole2(name,y,setter)
         local f=Instance.new("Frame")
-        f.Size=UDim2.new(1,-10,0,30)
+        f.Size=UDim2.new(1,-10,0,28)
         f.Position=UDim2.new(0,5,0,y)
-        f.BackgroundColor3=Color3.fromRGB(30,30,50)
+        f.BackgroundColor3=Color3.fromRGB(20,20,40)
         f.BorderSizePixel=0
         f.Parent=sub
         Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=f
         local l=Instance.new("TextLabel")
         l.Size=UDim2.new(.6,0,1,0)
-        l.Position=UDim2.new(0,7,0,0)
+        l.Position=UDim2.new(0,6,0,0)
         l.BackgroundTransparency=1
         l.Text=name
-        l.TextColor3=Color3.fromRGB(200,220,255)
+        l.TextColor3=Color3.fromRGB(0,255,255)
         l.Font=Enum.Font.Gotham
         l.TextSize=10
         l.Parent=f
         local b=Instance.new("TextButton")
-        b.Size=UDim2.new(0,45,0,20)
-        b.Position=UDim2.new(1,-50,0,5)
-        b.BackgroundColor3=Color3.fromRGB(40,40,70)
+        b.Size=UDim2.new(0,42,0,18)
+        b.Position=UDim2.new(1,-47,0,5)
+        b.BackgroundColor3=Color3.fromRGB(30,30,50)
         b.Text="OFF"
         b.TextColor3=Color3.fromRGB(150,170,200)
         b.Font=Enum.Font.GothamBold
-        b.TextSize=9
+        b.TextSize=8
         b.Parent=f
-        Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
+        Instance.new("UICorner").CornerRadius=UDim.new(0,9)Instance.new("UICorner").Parent=b
         b.MouseButton1Click:Connect(function()
             local st=not(b.Text=="ON")
-            b.BackgroundColor3=st and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
+            b.BackgroundColor3=st and Color3.fromRGB(0,255,100)or Color3.fromRGB(30,30,50)
             b.Text=st and"ON"or"OFF"
             setter(st)
         end)
     end
-    mkRole2("Murderer (Red)",5,function(st)Boxes_Murderer=st end)
-    mkRole2("Sheriff (Blue)",38,function(st)Boxes_Sheriff=st end)
-    mkRole2("Innocent (Green)",71,function(st)Boxes_Innocent=st end)
-end,110,function(state)Boxes_Enabled=state end)
+    mkRole2("Murderer",5,function(st)Boxes_Murderer=st end)
+    mkRole2("Sheriff",36,function(st)Boxes_Sheriff=st end)
+    mkRole2("Innocent",67,function(st)Boxes_Innocent=st end)
+end,100,function(state)Boxes_Enabled=state end)
 
-VisualSF.CanvasSize=UDim2.new(0,0,0,300)
+-- Tracer
+mkToggleWithSub(VisualSF,"Tracer",215,function(sub)
+    local colors={
+        {Name="Cyan",Color=Color3.fromRGB(0,255,255)},
+        {Name="Magenta",Color=Color3.fromRGB(255,0,255)},
+        {Name="Green",Color=Color3.fromRGB(0,255,100)},
+        {Name="Red",Color=Color3.fromRGB(255,50,50)},
+        {Name="Blue",Color=Color3.fromRGB(0,100,255)},
+        {Name="Yellow",Color=Color3.fromRGB(255,255,0)},
+    }
+    
+    for i,c in pairs(colors)do
+        local b=Instance.new("TextButton")
+        b.Size=UDim2.new(1,-10,0,25)
+        b.Position=UDim2.new(0,5,0,(i-1)*28)
+        b.BackgroundColor3=c.Color
+        b.Text=c.Name
+        b.TextColor3=Color3.fromRGB(10,10,20)
+        b.Font=Enum.Font.GothamBold
+        b.TextSize=9
+        b.Parent=sub
+        Instance.new("UICorner").CornerRadius=UDim.new(0,5)Instance.new("UICorner").Parent=b
+        b.MouseButton1Click:Connect(function()
+            TracerColor=c.Color
+            Notify("Tracer color: "..c.Name)
+        end)
+    end
+end,175,function(state)Tracer_Enabled=state end)
+
+VisualSF.CanvasSize=UDim2.new(0,0,0,400)
 
 -- ============ FLING ============
 local FlingSF=MM2TabFrames.Fling
@@ -702,7 +906,7 @@ local FlingSF=MM2TabFrames.Fling
 local FlingPlayerList=Instance.new("ScrollingFrame")
 FlingPlayerList.Size=UDim2.new(1,-10,0,280)
 FlingPlayerList.Position=UDim2.new(0,5,0,5)
-FlingPlayerList.BackgroundColor3=Color3.fromRGB(18,18,30)
+FlingPlayerList.BackgroundColor3=Color3.fromRGB(15,15,25)
 FlingPlayerList.BorderSizePixel=0
 FlingPlayerList.Parent=FlingSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=FlingPlayerList
@@ -714,18 +918,18 @@ local function RefreshFlingList()
         for _,p in pairs(P:GetPlayers())do
             if p~=L then
                 local b=Instance.new("TextButton")
-                b.Size=UDim2.new(1,-10,0,30)
+                b.Size=UDim2.new(1,-10,0,28)
                 b.Position=UDim2.new(0,5,0,y)
-                b.BackgroundColor3=Color3.fromRGB(30,30,50)
+                b.BackgroundColor3=Color3.fromRGB(20,20,35)
                 b.Text=p.Name
-                b.TextColor3=Color3.fromRGB(200,220,255)
+                b.TextColor3=Color3.fromRGB(0,255,255)
                 b.Font=Enum.Font.GothamBold
-                b.TextSize=10
+                b.TextSize=9
                 b.Parent=FlingPlayerList
                 Instance.new("UICorner").CornerRadius=UDim.new(0,5)Instance.new("UICorner").Parent=b
                 b.MouseButton1Click:Connect(function()RealFling(p)end)
                 b.Activated:Connect(function()RealFling(p)end)
-                y+=35
+                y+=32
             end
         end
         FlingPlayerList.CanvasSize=UDim2.new(0,0,0,y)
@@ -734,58 +938,89 @@ end
 RefreshFlingList()
 
 local FlingMurdererBtn=Instance.new("TextButton")
-FlingMurdererBtn.Size=UDim2.new(1,-10,0,40)
+FlingMurdererBtn.Size=UDim2.new(1,-10,0,35)
 FlingMurdererBtn.Position=UDim2.new(0,5,0,295)
-FlingMurdererBtn.BackgroundColor3=Color3.fromRGB(255,80,80)
+FlingMurdererBtn.BackgroundColor3=Color3.fromRGB(255,0,255)
 FlingMurdererBtn.Text="РВАНУТЬ МАРДЕРА"
-FlingMurdererBtn.TextColor3=Color3.fromRGB(255,255,255)
+FlingMurdererBtn.TextColor3=Color3.fromRGB(10,10,20)
 FlingMurdererBtn.Font=Enum.Font.GothamBlack
-FlingMurdererBtn.TextSize=12
+FlingMurdererBtn.TextSize=11
 FlingMurdererBtn.Parent=FlingSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=FlingMurdererBtn
 
 FlingMurdererBtn.MouseButton1Click:Connect(function()
     pcall(function()
         for _,p in pairs(P:GetPlayers())do
-            if p~=L and getRole(p)=="Murderer"then
-                RealFling(p)
-                break
-            end
+            if p~=L and getRole(p)=="Murderer"then RealFling(p)break end
         end
     end)
 end)
 
 local FlingSheriffBtn=Instance.new("TextButton")
-FlingSheriffBtn.Size=UDim2.new(1,-10,0,40)
-FlingSheriffBtn.Position=UDim2.new(0,5,0,340)
-FlingSheriffBtn.BackgroundColor3=Color3.fromRGB(60,100,200)
+FlingSheriffBtn.Size=UDim2.new(1,-10,0,35)
+FlingSheriffBtn.Position=UDim2.new(0,5,0,335)
+FlingSheriffBtn.BackgroundColor3=Color3.fromRGB(0,100,255)
 FlingSheriffBtn.Text="РВАНУТЬ ШЕРИФА"
-FlingSheriffBtn.TextColor3=Color3.fromRGB(255,255,255)
+FlingSheriffBtn.TextColor3=Color3.fromRGB(10,10,20)
 FlingSheriffBtn.Font=Enum.Font.GothamBlack
-FlingSheriffBtn.TextSize=12
+FlingSheriffBtn.TextSize=11
 FlingSheriffBtn.Parent=FlingSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=FlingSheriffBtn
 
 FlingSheriffBtn.MouseButton1Click:Connect(function()
     pcall(function()
         for _,p in pairs(P:GetPlayers())do
-            if p~=L and getRole(p)=="Sheriff"then
-                RealFling(p)
-                break
-            end
+            if p~=L and getRole(p)=="Sheriff"then RealFling(p)break end
         end
     end)
 end)
 
-FlingSF.CanvasSize=UDim2.new(0,0,0,390)
+FlingSF.CanvasSize=UDim2.new(0,0,0,380)
 
 -- ============ OTHERS ============
 local OthersSF=MM2TabFrames.Others
 
+-- Anti-Fling
+local AntiFlingFrame=Instance.new("Frame")
+AntiFlingFrame.Size=UDim2.new(1,-10,0,38)
+AntiFlingFrame.Position=UDim2.new(0,5,0,5)
+AntiFlingFrame.BackgroundColor3=Color3.fromRGB(15,15,30)
+AntiFlingFrame.BorderSizePixel=0
+AntiFlingFrame.Parent=OthersSF
+Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=AntiFlingFrame
+
+local AntiFlingLabel=Instance.new("TextLabel")
+AntiFlingLabel.Size=UDim2.new(.55,0,1,0)
+AntiFlingLabel.Position=UDim2.new(0,9,0,0)
+AntiFlingLabel.BackgroundTransparency=1
+AntiFlingLabel.Text="Anti-Fling"
+AntiFlingLabel.TextColor3=Color3.fromRGB(0,255,255)
+AntiFlingLabel.Font=Enum.Font.Gotham
+AntiFlingLabel.TextSize=12
+AntiFlingLabel.Parent=AntiFlingFrame
+
+local AntiFlingToggle=Instance.new("TextButton")
+AntiFlingToggle.Size=UDim2.new(0,50,0,22)
+AntiFlingToggle.Position=UDim2.new(1,-55,0,8)
+AntiFlingToggle.BackgroundColor3=Color3.fromRGB(30,30,50)
+AntiFlingToggle.Text="OFF"
+AntiFlingToggle.TextColor3=Color3.fromRGB(150,170,200)
+AntiFlingToggle.Font=Enum.Font.GothamBold
+AntiFlingToggle.TextSize=9
+AntiFlingToggle.Parent=AntiFlingFrame
+Instance.new("UICorner").CornerRadius=UDim.new(0,11)Instance.new("UICorner").Parent=AntiFlingToggle
+
+AntiFlingToggle.MouseButton1Click:Connect(function()
+    AntiFling_Enabled=not AntiFling_Enabled
+    AntiFlingToggle.BackgroundColor3=AntiFling_Enabled and Color3.fromRGB(0,255,100)or Color3.fromRGB(30,30,50)
+    AntiFlingToggle.Text=AntiFling_Enabled and"ON"or"OFF"
+end)
+
+-- Hide Key
 local HideFrame=Instance.new("Frame")
 HideFrame.Size=UDim2.new(1,-10,0,60)
-HideFrame.Position=UDim2.new(0,5,0,5)
-HideFrame.BackgroundColor3=Color3.fromRGB(20,20,38)
+HideFrame.Position=UDim2.new(0,5,0,50)
+HideFrame.BackgroundColor3=Color3.fromRGB(15,15,30)
 HideFrame.BorderSizePixel=0
 HideFrame.Parent=OthersSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=HideFrame
@@ -795,7 +1030,7 @@ HideLabel.Size=UDim2.new(1,0,0,25)
 HideLabel.Position=UDim2.new(0,5,0,5)
 HideLabel.BackgroundTransparency=1
 HideLabel.Text="Hide Key: "..HideKey
-HideLabel.TextColor3=Color3.fromRGB(200,220,255)
+HideLabel.TextColor3=Color3.fromRGB(0,255,255)
 HideLabel.Font=Enum.Font.GothamBold
 HideLabel.TextSize=12
 HideLabel.Parent=HideFrame
@@ -803,9 +1038,9 @@ HideLabel.Parent=HideFrame
 local ChangeKeyBtn=Instance.new("TextButton")
 ChangeKeyBtn.Size=UDim2.new(1,-20,0,25)
 ChangeKeyBtn.Position=UDim2.new(0,10,0,32)
-ChangeKeyBtn.BackgroundColor3=Color3.fromRGB(60,100,200)
+ChangeKeyBtn.BackgroundColor3=Color3.fromRGB(0,255,255)
 ChangeKeyBtn.Text="CHANGE KEY"
-ChangeKeyBtn.TextColor3=Color3.fromRGB(255,255,255)
+ChangeKeyBtn.TextColor3=Color3.fromRGB(10,10,20)
 ChangeKeyBtn.Font=Enum.Font.GothamBold
 ChangeKeyBtn.TextSize=10
 ChangeKeyBtn.Parent=HideFrame
@@ -828,16 +1063,17 @@ U.InputBegan:Connect(function(input,gameProcessed)
     end
 end)
 
-OthersSF.CanvasSize=UDim2.new(0,0,0,100)
+OthersSF.CanvasSize=UDim2.new(0,0,0,120)
 
 -- ============ INIT ============
 MM2TabFrames.Combat.Visible=true
-MM2TabButtons.Combat.BackgroundColor3=Color3.fromRGB(60,100,200)
-MM2TabButtons.Combat.TextColor3=Color3.fromRGB(255,255,255)
+MM2TabButtons.Combat.BackgroundColor3=Color3.fromRGB(0,255,255)
+MM2TabButtons.Combat.TextColor3=Color3.fromRGB(10,10,20)
 
 -- ============ LOGIC ============
 R.RenderStepped:Connect(function()
     pcall(function()
+        -- Aimbot
         if Aimbot_Enabled and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
             local target=nil
             local minDist=math.huge
@@ -852,12 +1088,23 @@ R.RenderStepped:Connect(function()
             end
         end
         
+        -- Kill All
         if KillAll_Enabled then
             for _,p in pairs(P:GetPlayers())do
                 if p~=L and not Whitelist[p.Name]and p.Character and p.Character:FindFirstChild("Humanoid")then
                     p.Character.Humanoid.Health=0
                 end
             end
+        end
+        
+        -- Spin
+        if Spin_Enabled and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
+            L.Character.HumanoidRootPart.CFrame=L.Character.HumanoidRootPart.CFrame*CFrame.Angles(0,math.rad(SpinSpeed),0)
+        end
+        
+        -- Anti-Fling
+        if AntiFling_Enabled then
+            ApplyAntiFling()
         end
     end)
 end)
@@ -986,4 +1233,4 @@ TopBarText.InputBegan:Connect(function(i)
     end
 end)
 
-Notify("SYPHIX HUB loaded! Fling works!")
+Notify("SYPHIX HUB loaded! Neon style!")
