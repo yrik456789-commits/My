@@ -1,11 +1,9 @@
--- SYPHIX HUB | v17 | Neon Style + All Fixed
+-- SYPHIX HUB | v18 | ALL FIXED
 local P,R,U,T,C,L=game:GetService("Players"),game:GetService("RunService"),game:GetService("UserInputService"),game:GetService("TweenService"),workspace.CurrentCamera,game:GetService("Players").LocalPlayer
 local VU=game:GetService("VirtualUser")
-local Lighting=game:GetService("Lighting")
 
 local function GetHui()
     pcall(function()if gethui then return gethui()end end)
-    pcall(function()if syn and syn.protect_gui then return game.CoreGui end end)
     return game.CoreGui
 end
 
@@ -35,12 +33,11 @@ local Spin_Enabled=false
 local SpinSpeed=10
 local AntiFling_Enabled=false
 local Tracer_Enabled=false
-local TracerColor=Color3.fromRGB(0,255,255)
+local TracerColor=Color3.fromRGB(255,255,255)
 local Whitelist={}
 local HideKey="LeftAlt"
 local EspHighlights={}
 local EspBoxes={}
-local TracerLines={}
 
 function getRole(p)
     if not p then return"Innocent"end
@@ -66,8 +63,8 @@ function getRole(p)
     return"Innocent"
 end
 
--- ============ ESP 24/7 РЕАЛЬНОГО ВРЕМЕНИ ============
-local function UpdateESP()
+-- ============ ESP КАЖДЫЙ КАДР ============
+R.RenderStepped:Connect(function()
     pcall(function()
         -- Очистка
         for p,h in pairs(EspHighlights)do
@@ -76,14 +73,8 @@ local function UpdateESP()
                 EspHighlights[p]=nil
             end
         end
-        for p,h in pairs(EspBoxes)do
-            if not h or not h.Parent or not p or not p.Parent then
-                if h then pcall(function()h:Destroy()end)end
-                EspBoxes[p]=nil
-            end
-        end
         
-        -- ESP для ВСЕХ игроков включая новых
+        -- ESP для ВСЕХ
         if ESP_Enabled or ESP_Murderer or ESP_Sheriff or ESP_Innocent then
             for _,p in pairs(P:GetPlayers())do
                 if p~=L and p.Character and p.Character:FindFirstChild("Head")then
@@ -99,7 +90,6 @@ local function UpdateESP()
                         local existing=EspHighlights[p]
                         if not existing or not existing.Parent then
                             existing=Instance.new("Highlight")
-                            existing.Name="ESP_"..p.Name
                             existing.FillColor=color
                             existing.FillTransparency=0.5
                             existing.OutlineColor=color
@@ -142,7 +132,6 @@ local function UpdateESP()
                         local existing=EspBoxes[p]
                         if not existing or not existing.Parent then
                             existing=Instance.new("Highlight")
-                            existing.Name="Box_"..p.Name
                             existing.FillColor=Color3.fromRGB(0,0,0)
                             existing.FillTransparency=1
                             existing.OutlineColor=color
@@ -168,197 +157,41 @@ local function UpdateESP()
             end
         end
     end)
-end
-
--- Обновление ESP КАЖДЫЙ КАДР (реальное время)
-R.RenderStepped:Connect(function()
-    UpdateESP()
 end)
 
--- ============ TRACER ПУЛЬ ============
-local function CreateBulletTracer(startPos,endPos)
+-- ============ НЕОНОВЫЙ ФОН ============
+local G=Instance.new("ScreenGui")G.Name="SyphixHub"G.Parent=GetHui()
+
+-- Неоновые звёздочки
+local Stars={}
+for i=1,60 do
     pcall(function()
-        local line=Drawing.new("Line")
-        line.Color=TracerColor
-        line.Thickness=3
-        line.Transparency=0
-        line.From=Vector2.new(startPos.X,startPos.Y)
-        line.To=Vector2.new(endPos.X,endPos.Y)
-        line.Visible=true
-        
-        -- Неоновая толщина
-        task.spawn(function()
-            for i=1,40 do
-                task.wait(0.1)
-                pcall(function()
-                    line.Transparency=i/40
-                    line.Thickness=math.max(1,3-(i/20))
-                end)
-            end
-            pcall(function()line:Remove()end)
-        end)
+        local s=Instance.new("Frame")
+        s.Size=UDim2.new(0,math.random(2,5),0,math.random(2,5))
+        s.Position=UDim2.new(math.random(),0,math.random(),0)
+        s.BackgroundColor3=Color3.fromHSV(math.random(),1,1)
+        s.BackgroundTransparency=0.5
+        s.BorderSizePixel=0
+        s.Parent=G
+        Instance.new("UICorner").CornerRadius=UDim.new(1,0)Instance.new("UICorner").Parent=s
+        Stars[#Stars+1]=s
     end)
 end
-
--- Отслеживание выстрелов
-local lastMousePos=Vector2.new(0,0)
-local lastFireTime=0
 
 task.spawn(function()
     while true do
         pcall(function()
-            if Tracer_Enabled and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
-                local hrp=L.Character.HumanoidRootPart
-                local mousePos=U:GetMouseLocation()
-                
-                -- Проверка на выстрел (клик)
-                if U:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)and tick()-lastFireTime>0.5 then
-                    lastFireTime=tick()
-                    
-                    local startScreen=C:WorldToScreenPoint(hrp.Position)
-                    local ray=C:ScreenPointToRay(mousePos.X,mousePos.Y,1000)
-                    local endScreen=C:WorldToScreenPoint(ray.Origin+ray.Direction*500)
-                    
-                    if startScreen and endScreen then
-                        CreateBulletTracer(
-                            Vector2.new(startScreen.X,startScreen.Y),
-                            Vector2.new(endScreen.X,endScreen.Y)
-                        )
-                    end
-                end
+            for _,s in pairs(Stars)do
+                s.BackgroundTransparency=0.2+math.sin(tick()*3+s.Position.X.Offset)*0.5
             end
         end)
         task.wait(0.05)
     end
 end)
 
--- ============ ФЛИНГ (РЕАЛЬНЫЙ) ============
-local function RealFling(targetPlayer)
-    pcall(function()
-        if not targetPlayer then return end
-        local char=targetPlayer.Character
-        if not char then return end
-        local hrp=char:FindFirstChild("HumanoidRootPart")
-        local hum=char:FindFirstChild("Humanoid")
-        if not hrp then return end
-        
-        -- Отключаем PlatformStand
-        if hum then
-            hum.PlatformStand=true
-            hum.Sit=false
-            hum:ChangeState(Enum.HumanoidStateType.Physics)
-        end
-        
-        -- CFrame телепорт
-        hrp.CFrame=hrp.CFrame+Vector3.new(0,100,0)
-        
-        -- Мощный импульс
-        hrp.Velocity=Vector3.new(math.random(-30000,30000),50000,math.random(-30000,30000))
-        hrp.RotVelocity=Vector3.new(math.random(-2000,2000),math.random(-2000,2000),math.random(-2000,2000))
-        
-        -- Повторные импульсы
-        task.delay(0.1,function()
-            pcall(function()
-                if hrp and hrp.Parent then
-                    hrp.Velocity=Vector3.new(math.random(-40000,40000),70000,math.random(-40000,40000))
-                end
-            end)
-        end)
-        
-        task.delay(0.3,function()
-            pcall(function()
-                if hrp and hrp.Parent then
-                    hrp.Velocity=Vector3.new(math.random(-50000,50000),100000,math.random(-50000,50000))
-                end
-            end)
-        end)
-        
-        -- Телепорт за карту
-        task.delay(1,function()
-            pcall(function()
-                if hrp and hrp.Parent then
-                    hrp.CFrame=CFrame.new(0,-2000,0)
-                    hrp.Velocity=Vector3.new(0,0,0)
-                    hrp.RotVelocity=Vector3.new(0,0,0)
-                end
-                if hum then hum.PlatformStand=false end
-            end)
-        end)
-        
-        Notify("РВАНУЛ "..targetPlayer.Name)
-    end)
-end
-
--- ============ GRAB GUN (РЕАЛЬНЫЙ) ============
-local function GrabGun()
-    pcall(function()
-        for _,p in pairs(P:GetPlayers())do
-            if p~=L then
-                -- Ищем пистолет у шерифа
-                if getRole(p)=="Sheriff"then
-                    local char=p.Character
-                    local bp=p:FindFirstChild("Backpack")
-                    
-                    -- В Character
-                    if char then
-                        for _,child in pairs(char:GetChildren())do
-                            if child:IsA("Tool")and(child.Name:lower():find("gun")or child.Name:lower():find("pistol"))then
-                                child.Parent=L.Backpack or L.Character
-                                Notify("Gun grabbed!")
-                                return
-                            end
-                        end
-                    end
-                    
-                    -- В Backpack
-                    if bp then
-                        for _,child in pairs(bp:GetChildren())do
-                            if child:IsA("Tool")and(child.Name:lower():find("gun")or child.Name:lower():find("pistol"))then
-                                child.Parent=L.Backpack or L.Character
-                                Notify("Gun grabbed!")
-                                return
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        Notify("Gun not found")
-    end)
-end
-
--- ============ АНТИ-ФЛИНГ (РЕАЛЬНЫЙ) ============
-local function ApplyAntiFling()
-    pcall(function()
-        if not L.Character then return end
-        local hrp=L.Character:FindFirstChild("HumanoidRootPart")
-        local hum=L.Character:FindFirstChild("Humanoid")
-        if not hrp then return end
-        
-        -- Проверка на подозрительную скорость
-        if hrp.Velocity.Magnitude>200 or hrp.RotVelocity.Magnitude>100 then
-            -- Нейтрализация
-            hrp.Velocity=Vector3.new(0,0,0)
-            hrp.RotVelocity=Vector3.new(0,0,0)
-            -- Отключение коллизии на 0.5 сек
-            if hum then
-                hum.PlatformStand=true
-                task.delay(0.5,function()
-                    pcall(function()
-                        if hum then hum.PlatformStand=false end
-                    end)
-                end)
-            end
-            -- Корректировка позиции
-            hrp.CFrame=hrp.CFrame+Vector3.new(0,-5,0)
-        end
-    end)
-end
-
--- ============ НЕОНОВЫЙ GUI ============
+-- ============ ЛАУНЧЕР ============
 local LG=Instance.new("ScreenGui")LG.Name="Launcher"LG.Parent=GetHui()
 
--- TopBar с неоном
 local TopBar=Instance.new("Frame")
 TopBar.Size=UDim2.new(0,200,0,40)
 TopBar.Position=UDim2.new(.5,-100,0,10)
@@ -367,7 +200,6 @@ TopBar.BorderSizePixel=0
 TopBar.Parent=LG
 Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=TopBar
 
--- Неоновая рамка
 local NeonBorder=Instance.new("Frame")
 NeonBorder.Size=UDim2.new(1,6,1,6)
 NeonBorder.Position=UDim2.new(0,-3,0,-3)
@@ -495,55 +327,56 @@ MM2BarArrow.TextSize=12
 MM2BarArrow.Parent=MM2Bar
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=MM2BarArrow
 
+-- MM2 PANEL (БОЛЬШЕ - 600x600)
 local MM2Panel=Instance.new("Frame")
 MM2Panel.Size=UDim2.new(0,0,0,0)
-MM2Panel.Position=UDim2.new(.5,-262,.5,-262)
+MM2Panel.Position=UDim2.new(.5,-300,.5,-300)
 MM2Panel.BackgroundColor3=Color3.fromRGB(10,10,20)
 MM2Panel.BorderSizePixel=0
 MM2Panel.BackgroundTransparency=1
 MM2Panel.ClipsDescendants=true
 MM2Panel.Visible=false
 MM2Panel.Parent=MG
-Instance.new("UICorner").CornerRadius=UDim.new(0,16)Instance.new("UICorner").Parent=MM2Panel
+Instance.new("UICorner").CornerRadius=UDim.new(0,20)Instance.new("UICorner").Parent=MM2Panel
 
 local MM2Header=Instance.new("Frame")
-MM2Header.Size=UDim2.new(1,0,0,50)
+MM2Header.Size=UDim2.new(1,0,0,55)
 MM2Header.BackgroundColor3=Color3.fromRGB(15,15,30)
 MM2Header.BorderSizePixel=0
 MM2Header.Parent=MM2Panel
-Instance.new("UICorner").CornerRadius=UDim.new(0,16)Instance.new("UICorner").Parent=MM2Header
+Instance.new("UICorner").CornerRadius=UDim.new(0,20)Instance.new("UICorner").Parent=MM2Header
 
 local MM2Title=Instance.new("TextLabel")
 MM2Title.Size=UDim2.new(0,200,0,30)
-MM2Title.Position=UDim2.new(0,15,0,10)
+MM2Title.Position=UDim2.new(0,15,0,12)
 MM2Title.BackgroundTransparency=1
 MM2Title.Text="SYPHIX MM2"
 MM2Title.TextColor3=Color3.fromRGB(255,0,255)
 MM2Title.Font=Enum.Font.GothamBlack
-MM2Title.TextSize=15
+MM2Title.TextSize=16
 MM2Title.Parent=MM2Header
 
 local MM2CloseBtn=Instance.new("TextButton")
-MM2CloseBtn.Size=UDim2.new(0,26,0,26)
-MM2CloseBtn.Position=UDim2.new(1,-32,0,12)
+MM2CloseBtn.Size=UDim2.new(0,28,0,28)
+MM2CloseBtn.Position=UDim2.new(1,-34,0,13)
 MM2CloseBtn.BackgroundColor3=Color3.fromRGB(255,0,100)
 MM2CloseBtn.Text="X"
 MM2CloseBtn.TextColor3=Color3.fromRGB(255,255,255)
 MM2CloseBtn.Font=Enum.Font.GothamBold
-MM2CloseBtn.TextSize=12
+MM2CloseBtn.TextSize=13
 MM2CloseBtn.Parent=MM2Header
-Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=MM2CloseBtn
+Instance.new("UICorner").CornerRadius=UDim.new(0,7)Instance.new("UICorner").Parent=MM2CloseBtn
 
 local MM2Tabs=Instance.new("Frame")
-MM2Tabs.Size=UDim2.new(0,120,1,-50)
-MM2Tabs.Position=UDim2.new(0,0,0,50)
+MM2Tabs.Size=UDim2.new(0,130,1,-55)
+MM2Tabs.Position=UDim2.new(0,0,0,55)
 MM2Tabs.BackgroundColor3=Color3.fromRGB(12,12,25)
 MM2Tabs.BorderSizePixel=0
 MM2Tabs.Parent=MM2Panel
 
 local MM2Content=Instance.new("Frame")
-MM2Content.Size=UDim2.new(1,-130,1,-60)
-MM2Content.Position=UDim2.new(0,125,0,55)
+MM2Content.Size=UDim2.new(1,-140,1,-65)
+MM2Content.Position=UDim2.new(0,135,0,60)
 MM2Content.BackgroundTransparency=1
 MM2Content.Parent=MM2Panel
 
@@ -563,13 +396,13 @@ for i=1,4 do
     MM2TabFrames[name]=SF
     
     local b=Instance.new("TextButton")
-    b.Size=UDim2.new(1,-10,0,50)
-    b.Position=UDim2.new(0,5,0,5+(i-1)*55)
+    b.Size=UDim2.new(1,-10,0,55)
+    b.Position=UDim2.new(0,5,0,5+(i-1)*60)
     b.BackgroundColor3=Color3.fromRGB(15,15,30)
     b.Text=name
     b.TextColor3=Color3.fromRGB(0,255,255)
     b.Font=Enum.Font.GothamBold
-    b.TextSize=11
+    b.TextSize=12
     b.Parent=MM2Tabs
     Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
     b.MouseButton1Click:Connect(function()
@@ -587,7 +420,7 @@ local CombatSF=MM2TabFrames.Combat
 
 local function mkToggleWithSub(parent,name,y,subContent,subHeight,onToggle)
     local mainFrame=Instance.new("Frame")
-    mainFrame.Size=UDim2.new(1,-10,0,38)
+    mainFrame.Size=UDim2.new(1,-10,0,42)
     mainFrame.Position=UDim2.new(0,5,0,y)
     mainFrame.BackgroundColor3=Color3.fromRGB(15,15,30)
     mainFrame.BorderSizePixel=0
@@ -596,7 +429,7 @@ local function mkToggleWithSub(parent,name,y,subContent,subHeight,onToggle)
     
     local label=Instance.new("TextLabel")
     label.Size=UDim2.new(.55,0,1,0)
-    label.Position=UDim2.new(0,9,0,0)
+    label.Position=UDim2.new(0,11,0,0)
     label.BackgroundTransparency=1
     label.Text=name
     label.TextColor3=Color3.fromRGB(0,255,255)
@@ -605,18 +438,18 @@ local function mkToggleWithSub(parent,name,y,subContent,subHeight,onToggle)
     label.Parent=mainFrame
     
     local toggle=Instance.new("TextButton")
-    toggle.Size=UDim2.new(0,50,0,22)
-    toggle.Position=UDim2.new(1,-95,0,8)
+    toggle.Size=UDim2.new(0,55,0,25)
+    toggle.Position=UDim2.new(1,-105,0,8)
     toggle.BackgroundColor3=Color3.fromRGB(30,30,50)
     toggle.Text="OFF"
     toggle.TextColor3=Color3.fromRGB(150,170,200)
     toggle.Font=Enum.Font.GothamBold
     toggle.TextSize=9
     toggle.Parent=mainFrame
-    Instance.new("UICorner").CornerRadius=UDim.new(0,11)Instance.new("UICorner").Parent=toggle
+    Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=toggle
     
     local expand=Instance.new("TextButton")
-    expand.Size=UDim2.new(0,22,0,22)
+    expand.Size=UDim2.new(0,25,0,25)
     expand.Position=UDim2.new(1,-32,0,8)
     expand.BackgroundColor3=Color3.fromRGB(0,255,255)
     expand.Text=">"
@@ -624,11 +457,12 @@ local function mkToggleWithSub(parent,name,y,subContent,subHeight,onToggle)
     expand.Font=Enum.Font.GothamBold
     expand.TextSize=11
     expand.Parent=mainFrame
-    Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=expand
+    Instance.new("UICorner").CornerRadius=UDim.new(0,7)Instance.new("UICorner").Parent=expand
     
+    -- Подменю ОТДЕЛЬНО (не двигает другие элементы)
     local submenu=Instance.new("Frame")
     submenu.Size=UDim2.new(1,-10,0,0)
-    submenu.Position=UDim2.new(0,5,0,y+41)
+    submenu.Position=UDim2.new(0,5,0,y+47)
     submenu.BackgroundColor3=Color3.fromRGB(20,20,40)
     submenu.BorderSizePixel=0
     submenu.ClipsDescendants=true
@@ -657,7 +491,6 @@ local function mkToggleWithSub(parent,name,y,subContent,subHeight,onToggle)
     end)
 end
 
--- Aimbot (компактный)
 mkToggleWithSub(CombatSF,"Aimbot",5,function(sub)
     local info=Instance.new("TextLabel")
     info.Size=UDim2.new(1,0,0,25)
@@ -668,10 +501,9 @@ mkToggleWithSub(CombatSF,"Aimbot",5,function(sub)
     info.Font=Enum.Font.Gotham
     info.TextSize=11
     info.Parent=sub
-end,60,function(state)Aimbot_Enabled=state end)
+end,40,function(state)Aimbot_Enabled=state end)
 
--- Kill All (компактный)
-mkToggleWithSub(CombatSF,"Kill All",48,function(sub)
+mkToggleWithSub(CombatSF,"Kill All",55,function(sub)
     local wl=Instance.new("ScrollingFrame")
     wl.Size=UDim2.new(1,-10,0,150)
     wl.Position=UDim2.new(0,5,0,5)
@@ -710,8 +542,7 @@ mkToggleWithSub(CombatSF,"Kill All",48,function(sub)
     refreshWL()
 end,160,function(state)KillAll_Enabled=state end)
 
--- Spin (с подменю скорости)
-mkToggleWithSub(CombatSF,"Spin",215,function(sub)
+mkToggleWithSub(CombatSF,"Spin",220,function(sub)
     local speedLabel=Instance.new("TextLabel")
     speedLabel.Size=UDim2.new(1,0,0,20)
     speedLabel.Position=UDim2.new(0,5,0,5)
@@ -750,10 +581,10 @@ mkToggleWithSub(CombatSF,"Spin",215,function(sub)
     end)
 end,50,function(state)Spin_Enabled=state end)
 
--- Grab Gun
+-- Grab Gun (ищет пистолет на КАРТЕ)
 local GrabGunFrame=Instance.new("Frame")
-GrabGunFrame.Size=UDim2.new(1,-10,0,38)
-GrabGunFrame.Position=UDim2.new(0,5,0,270)
+GrabGunFrame.Size=UDim2.new(1,-10,0,42)
+GrabGunFrame.Position=UDim2.new(0,5,0,275)
 GrabGunFrame.BackgroundColor3=Color3.fromRGB(15,15,30)
 GrabGunFrame.BorderSizePixel=0
 GrabGunFrame.Parent=CombatSF
@@ -761,7 +592,7 @@ Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Pare
 
 local GrabGunLabel=Instance.new("TextLabel")
 GrabGunLabel.Size=UDim2.new(.55,0,1,0)
-GrabGunLabel.Position=UDim2.new(0,9,0,0)
+GrabGunLabel.Position=UDim2.new(0,11,0,0)
 GrabGunLabel.BackgroundTransparency=1
 GrabGunLabel.Text="Grab Gun"
 GrabGunLabel.TextColor3=Color3.fromRGB(0,255,255)
@@ -770,28 +601,57 @@ GrabGunLabel.TextSize=12
 GrabGunLabel.Parent=GrabGunFrame
 
 local GrabGunBtn=Instance.new("TextButton")
-GrabGunBtn.Size=UDim2.new(0,50,0,22)
-GrabGunBtn.Position=UDim2.new(1,-55,0,8)
+GrabGunBtn.Size=UDim2.new(0,55,0,25)
+GrabGunBtn.Position=UDim2.new(1,-60,0,8)
 GrabGunBtn.BackgroundColor3=Color3.fromRGB(0,255,255)
 GrabGunBtn.Text="GRAB"
 GrabGunBtn.TextColor3=Color3.fromRGB(10,10,20)
 GrabGunBtn.Font=Enum.Font.GothamBold
 GrabGunBtn.TextSize=9
 GrabGunBtn.Parent=GrabGunFrame
-Instance.new("UICorner").CornerRadius=UDim.new(0,11)Instance.new("UICorner").Parent=GrabGunBtn
+Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=GrabGunBtn
 
-GrabGunBtn.MouseButton1Click:Connect(GrabGun)
+GrabGunBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        -- Ищем пистолет на КАРТЕ (workspace)
+        for _,v in pairs(workspace:GetDescendants())do
+            if v:IsA("Tool")then
+                local n=v.Name:lower()
+                if n:find("gun")or n:find("pistol")or n:find("revolver")then
+                    v.Parent=L.Backpack or L.Character
+                    Notify("Gun grabbed from map!")
+                    return
+                end
+            end
+        end
+        -- Если на карте нет, ищем у игроков
+        for _,p in pairs(P:GetPlayers())do
+            if p~=L and getRole(p)=="Sheriff"then
+                local char=p.Character
+                if char then
+                    for _,child in pairs(char:GetChildren())do
+                        if child:IsA("Tool")and(child.Name:lower():find("gun")or child.Name:lower():find("pistol"))then
+                            child.Parent=L.Backpack or L.Character
+                            Notify("Gun grabbed from Sheriff!")
+                            return
+                        end
+                    end
+                end
+            end
+        end
+        Notify("Gun not found")
+    end)
+end)
 
-CombatSF.CanvasSize=UDim2.new(0,0,0,320)
+CombatSF.CanvasSize=UDim2.new(0,0,0,330)
 
 -- ============ VISUAL ============
 local VisualSF=MM2TabFrames.Visual
 
--- ESP
 mkToggleWithSub(VisualSF,"ESP",5,function(sub)
     local function mkRole(name,y,setter)
         local f=Instance.new("Frame")
-        f.Size=UDim2.new(1,-10,0,28)
+        f.Size=UDim2.new(1,-10,0,30)
         f.Position=UDim2.new(0,5,0,y)
         f.BackgroundColor3=Color3.fromRGB(20,20,40)
         f.BorderSizePixel=0
@@ -799,7 +659,7 @@ mkToggleWithSub(VisualSF,"ESP",5,function(sub)
         Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=f
         local l=Instance.new("TextLabel")
         l.Size=UDim2.new(.6,0,1,0)
-        l.Position=UDim2.new(0,6,0,0)
+        l.Position=UDim2.new(0,7,0,0)
         l.BackgroundTransparency=1
         l.Text=name
         l.TextColor3=Color3.fromRGB(0,255,255)
@@ -807,15 +667,15 @@ mkToggleWithSub(VisualSF,"ESP",5,function(sub)
         l.TextSize=10
         l.Parent=f
         local b=Instance.new("TextButton")
-        b.Size=UDim2.new(0,42,0,18)
-        b.Position=UDim2.new(1,-47,0,5)
+        b.Size=UDim2.new(0,45,0,20)
+        b.Position=UDim2.new(1,-50,0,5)
         b.BackgroundColor3=Color3.fromRGB(30,30,50)
         b.Text="OFF"
         b.TextColor3=Color3.fromRGB(150,170,200)
         b.Font=Enum.Font.GothamBold
         b.TextSize=8
         b.Parent=f
-        Instance.new("UICorner").CornerRadius=UDim.new(0,9)Instance.new("UICorner").Parent=b
+        Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
         b.MouseButton1Click:Connect(function()
             local st=not(b.Text=="ON")
             b.BackgroundColor3=st and Color3.fromRGB(0,255,100)or Color3.fromRGB(30,30,50)
@@ -824,15 +684,14 @@ mkToggleWithSub(VisualSF,"ESP",5,function(sub)
         end)
     end
     mkRole("Murderer",5,function(st)ESP_Murderer=st end)
-    mkRole("Sheriff",36,function(st)ESP_Sheriff=st end)
-    mkRole("Innocent",67,function(st)ESP_Innocent=st end)
-end,100,function(state)ESP_Enabled=state end)
+    mkRole("Sheriff",38,function(st)ESP_Sheriff=st end)
+    mkRole("Innocent",71,function(st)ESP_Innocent=st end)
+end,110,function(state)ESP_Enabled=state end)
 
--- Boxes
-mkToggleWithSub(VisualSF,"Boxes",110,function(sub)
+mkToggleWithSub(VisualSF,"Boxes",120,function(sub)
     local function mkRole2(name,y,setter)
         local f=Instance.new("Frame")
-        f.Size=UDim2.new(1,-10,0,28)
+        f.Size=UDim2.new(1,-10,0,30)
         f.Position=UDim2.new(0,5,0,y)
         f.BackgroundColor3=Color3.fromRGB(20,20,40)
         f.BorderSizePixel=0
@@ -840,7 +699,7 @@ mkToggleWithSub(VisualSF,"Boxes",110,function(sub)
         Instance.new("UICorner").CornerRadius=UDim.new(0,6)Instance.new("UICorner").Parent=f
         local l=Instance.new("TextLabel")
         l.Size=UDim2.new(.6,0,1,0)
-        l.Position=UDim2.new(0,6,0,0)
+        l.Position=UDim2.new(0,7,0,0)
         l.BackgroundTransparency=1
         l.Text=name
         l.TextColor3=Color3.fromRGB(0,255,255)
@@ -848,15 +707,15 @@ mkToggleWithSub(VisualSF,"Boxes",110,function(sub)
         l.TextSize=10
         l.Parent=f
         local b=Instance.new("TextButton")
-        b.Size=UDim2.new(0,42,0,18)
-        b.Position=UDim2.new(1,-47,0,5)
+        b.Size=UDim2.new(0,45,0,20)
+        b.Position=UDim2.new(1,-50,0,5)
         b.BackgroundColor3=Color3.fromRGB(30,30,50)
         b.Text="OFF"
         b.TextColor3=Color3.fromRGB(150,170,200)
         b.Font=Enum.Font.GothamBold
         b.TextSize=8
         b.Parent=f
-        Instance.new("UICorner").CornerRadius=UDim.new(0,9)Instance.new("UICorner").Parent=b
+        Instance.new("UICorner").CornerRadius=UDim.new(0,10)Instance.new("UICorner").Parent=b
         b.MouseButton1Click:Connect(function()
             local st=not(b.Text=="ON")
             b.BackgroundColor3=st and Color3.fromRGB(0,255,100)or Color3.fromRGB(30,30,50)
@@ -865,19 +724,17 @@ mkToggleWithSub(VisualSF,"Boxes",110,function(sub)
         end)
     end
     mkRole2("Murderer",5,function(st)Boxes_Murderer=st end)
-    mkRole2("Sheriff",36,function(st)Boxes_Sheriff=st end)
-    mkRole2("Innocent",67,function(st)Boxes_Innocent=st end)
-end,100,function(state)Boxes_Enabled=state end)
+    mkRole2("Sheriff",38,function(st)Boxes_Sheriff=st end)
+    mkRole2("Innocent",71,function(st)Boxes_Innocent=st end)
+end,110,function(state)Boxes_Enabled=state end)
 
--- Tracer
-mkToggleWithSub(VisualSF,"Tracer",215,function(sub)
+-- Tracer (НОРМАЛЬНЫЙ для пуль)
+mkToggleWithSub(VisualSF,"Tracer",235,function(sub)
     local colors={
-        {Name="Cyan",Color=Color3.fromRGB(0,255,255)},
-        {Name="Magenta",Color=Color3.fromRGB(255,0,255)},
-        {Name="Green",Color=Color3.fromRGB(0,255,100)},
+        {Name="White",Color=Color3.fromRGB(255,255,255)},
         {Name="Red",Color=Color3.fromRGB(255,50,50)},
         {Name="Blue",Color=Color3.fromRGB(0,100,255)},
-        {Name="Yellow",Color=Color3.fromRGB(255,255,0)},
+        {Name="Green",Color=Color3.fromRGB(0,255,100)},
     }
     
     for i,c in pairs(colors)do
@@ -893,23 +750,57 @@ mkToggleWithSub(VisualSF,"Tracer",215,function(sub)
         Instance.new("UICorner").CornerRadius=UDim.new(0,5)Instance.new("UICorner").Parent=b
         b.MouseButton1Click:Connect(function()
             TracerColor=c.Color
-            Notify("Tracer color: "..c.Name)
         end)
     end
-end,175,function(state)Tracer_Enabled=state end)
+end,120,function(state)Tracer_Enabled=state end)
 
-VisualSF.CanvasSize=UDim2.new(0,0,0,400)
+VisualSF.CanvasSize=UDim2.new(0,0,0,360)
 
 -- ============ FLING ============
 local FlingSF=MM2TabFrames.Fling
 
 local FlingPlayerList=Instance.new("ScrollingFrame")
-FlingPlayerList.Size=UDim2.new(1,-10,0,280)
+FlingPlayerList.Size=UDim2.new(1,-10,0,300)
 FlingPlayerList.Position=UDim2.new(0,5,0,5)
 FlingPlayerList.BackgroundColor3=Color3.fromRGB(15,15,25)
 FlingPlayerList.BorderSizePixel=0
 FlingPlayerList.Parent=FlingSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=FlingPlayerList
+
+local function RealFling(targetPlayer)
+    pcall(function()
+        if not targetPlayer then return end
+        local char=targetPlayer.Character
+        if not char then return end
+        local hrp=char:FindFirstChild("HumanoidRootPart")
+        local hum=char:FindFirstChild("Humanoid")
+        if not hrp then return end
+        
+        -- Отключаем анимации
+        if hum then
+            hum.PlatformStand=true
+            hum:ChangeState(Enum.HumanoidStateType.Physics)
+        end
+        
+        -- Мощный импульс
+        hrp.Velocity=Vector3.new(math.random(-50000,50000),100000,math.random(-50000,50000))
+        hrp.RotVelocity=Vector3.new(math.random(-5000,5000),math.random(-5000,5000),math.random(-5000,5000))
+        
+        -- Телепорт за карту через 0.5 сек
+        task.delay(0.5,function()
+            pcall(function()
+                if hrp and hrp.Parent then
+                    hrp.CFrame=CFrame.new(0,-3000,0)
+                    hrp.Velocity=Vector3.new(0,0,0)
+                    hrp.RotVelocity=Vector3.new(0,0,0)
+                end
+                if hum then hum.PlatformStand=false end
+            end)
+        end)
+        
+        Notify("РВАНУЛ "..targetPlayer.Name)
+    end)
+end
 
 local function RefreshFlingList()
     pcall(function()
@@ -918,18 +809,18 @@ local function RefreshFlingList()
         for _,p in pairs(P:GetPlayers())do
             if p~=L then
                 local b=Instance.new("TextButton")
-                b.Size=UDim2.new(1,-10,0,28)
+                b.Size=UDim2.new(1,-10,0,30)
                 b.Position=UDim2.new(0,5,0,y)
                 b.BackgroundColor3=Color3.fromRGB(20,20,35)
                 b.Text=p.Name
                 b.TextColor3=Color3.fromRGB(0,255,255)
                 b.Font=Enum.Font.GothamBold
-                b.TextSize=9
+                b.TextSize=10
                 b.Parent=FlingPlayerList
                 Instance.new("UICorner").CornerRadius=UDim.new(0,5)Instance.new("UICorner").Parent=b
                 b.MouseButton1Click:Connect(function()RealFling(p)end)
                 b.Activated:Connect(function()RealFling(p)end)
-                y+=32
+                y+=34
             end
         end
         FlingPlayerList.CanvasSize=UDim2.new(0,0,0,y)
@@ -938,51 +829,48 @@ end
 RefreshFlingList()
 
 local FlingMurdererBtn=Instance.new("TextButton")
-FlingMurdererBtn.Size=UDim2.new(1,-10,0,35)
-FlingMurdererBtn.Position=UDim2.new(0,5,0,295)
+FlingMurdererBtn.Size=UDim2.new(1,-10,0,40)
+FlingMurdererBtn.Position=UDim2.new(0,5,0,315)
 FlingMurdererBtn.BackgroundColor3=Color3.fromRGB(255,0,255)
 FlingMurdererBtn.Text="РВАНУТЬ МАРДЕРА"
 FlingMurdererBtn.TextColor3=Color3.fromRGB(10,10,20)
 FlingMurdererBtn.Font=Enum.Font.GothamBlack
-FlingMurdererBtn.TextSize=11
+FlingMurdererBtn.TextSize=12
 FlingMurdererBtn.Parent=FlingSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=FlingMurdererBtn
-
 FlingMurdererBtn.MouseButton1Click:Connect(function()
     pcall(function()
         for _,p in pairs(P:GetPlayers())do
-            if p~=L and getRole(p)=="Murderer"then RealFling(p)break end
+            if p~=L and getRole(p)=="Murderer"then RealFling(p)return end
         end
     end)
 end)
 
 local FlingSheriffBtn=Instance.new("TextButton")
-FlingSheriffBtn.Size=UDim2.new(1,-10,0,35)
-FlingSheriffBtn.Position=UDim2.new(0,5,0,335)
+FlingSheriffBtn.Size=UDim2.new(1,-10,0,40)
+FlingSheriffBtn.Position=UDim2.new(0,5,0,360)
 FlingSheriffBtn.BackgroundColor3=Color3.fromRGB(0,100,255)
 FlingSheriffBtn.Text="РВАНУТЬ ШЕРИФА"
 FlingSheriffBtn.TextColor3=Color3.fromRGB(10,10,20)
 FlingSheriffBtn.Font=Enum.Font.GothamBlack
-FlingSheriffBtn.TextSize=11
+FlingSheriffBtn.TextSize=12
 FlingSheriffBtn.Parent=FlingSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=FlingSheriffBtn
-
 FlingSheriffBtn.MouseButton1Click:Connect(function()
     pcall(function()
         for _,p in pairs(P:GetPlayers())do
-            if p~=L and getRole(p)=="Sheriff"then RealFling(p)break end
+            if p~=L and getRole(p)=="Sheriff"then RealFling(p)return end
         end
     end)
 end)
 
-FlingSF.CanvasSize=UDim2.new(0,0,0,380)
+FlingSF.CanvasSize=UDim2.new(0,0,0,410)
 
 -- ============ OTHERS ============
 local OthersSF=MM2TabFrames.Others
 
--- Anti-Fling
 local AntiFlingFrame=Instance.new("Frame")
-AntiFlingFrame.Size=UDim2.new(1,-10,0,38)
+AntiFlingFrame.Size=UDim2.new(1,-10,0,42)
 AntiFlingFrame.Position=UDim2.new(0,5,0,5)
 AntiFlingFrame.BackgroundColor3=Color3.fromRGB(15,15,30)
 AntiFlingFrame.BorderSizePixel=0
@@ -991,7 +879,7 @@ Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Pare
 
 local AntiFlingLabel=Instance.new("TextLabel")
 AntiFlingLabel.Size=UDim2.new(.55,0,1,0)
-AntiFlingLabel.Position=UDim2.new(0,9,0,0)
+AntiFlingLabel.Position=UDim2.new(0,11,0,0)
 AntiFlingLabel.BackgroundTransparency=1
 AntiFlingLabel.Text="Anti-Fling"
 AntiFlingLabel.TextColor3=Color3.fromRGB(0,255,255)
@@ -1000,15 +888,15 @@ AntiFlingLabel.TextSize=12
 AntiFlingLabel.Parent=AntiFlingFrame
 
 local AntiFlingToggle=Instance.new("TextButton")
-AntiFlingToggle.Size=UDim2.new(0,50,0,22)
-AntiFlingToggle.Position=UDim2.new(1,-55,0,8)
+AntiFlingToggle.Size=UDim2.new(0,55,0,25)
+AntiFlingToggle.Position=UDim2.new(1,-60,0,8)
 AntiFlingToggle.BackgroundColor3=Color3.fromRGB(30,30,50)
 AntiFlingToggle.Text="OFF"
 AntiFlingToggle.TextColor3=Color3.fromRGB(150,170,200)
 AntiFlingToggle.Font=Enum.Font.GothamBold
 AntiFlingToggle.TextSize=9
 AntiFlingToggle.Parent=AntiFlingFrame
-Instance.new("UICorner").CornerRadius=UDim.new(0,11)Instance.new("UICorner").Parent=AntiFlingToggle
+Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=AntiFlingToggle
 
 AntiFlingToggle.MouseButton1Click:Connect(function()
     AntiFling_Enabled=not AntiFling_Enabled
@@ -1016,10 +904,9 @@ AntiFlingToggle.MouseButton1Click:Connect(function()
     AntiFlingToggle.Text=AntiFling_Enabled and"ON"or"OFF"
 end)
 
--- Hide Key
 local HideFrame=Instance.new("Frame")
 HideFrame.Size=UDim2.new(1,-10,0,60)
-HideFrame.Position=UDim2.new(0,5,0,50)
+HideFrame.Position=UDim2.new(0,5,0,55)
 HideFrame.BackgroundColor3=Color3.fromRGB(15,15,30)
 HideFrame.BorderSizePixel=0
 HideFrame.Parent=OthersSF
@@ -1063,7 +950,7 @@ U.InputBegan:Connect(function(input,gameProcessed)
     end
 end)
 
-OthersSF.CanvasSize=UDim2.new(0,0,0,120)
+OthersSF.CanvasSize=UDim2.new(0,0,0,130)
 
 -- ============ INIT ============
 MM2TabFrames.Combat.Visible=true
@@ -1073,7 +960,6 @@ MM2TabButtons.Combat.TextColor3=Color3.fromRGB(10,10,20)
 -- ============ LOGIC ============
 R.RenderStepped:Connect(function()
     pcall(function()
-        -- Aimbot
         if Aimbot_Enabled and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
             local target=nil
             local minDist=math.huge
@@ -1088,7 +974,6 @@ R.RenderStepped:Connect(function()
             end
         end
         
-        -- Kill All
         if KillAll_Enabled then
             for _,p in pairs(P:GetPlayers())do
                 if p~=L and not Whitelist[p.Name]and p.Character and p.Character:FindFirstChild("Humanoid")then
@@ -1097,14 +982,18 @@ R.RenderStepped:Connect(function()
             end
         end
         
-        -- Spin
         if Spin_Enabled and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
             L.Character.HumanoidRootPart.CFrame=L.Character.HumanoidRootPart.CFrame*CFrame.Angles(0,math.rad(SpinSpeed),0)
         end
         
-        -- Anti-Fling
-        if AntiFling_Enabled then
-            ApplyAntiFling()
+        if AntiFling_Enabled and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
+            local hrp=L.Character.HumanoidRootPart
+            if hrp.Velocity.Magnitude>200 then
+                hrp.Velocity=Vector3.new(0,0,0)
+                hrp.RotVelocity=Vector3.new(0,0,0)
+                local hum=L.Character:FindFirstChild("Humanoid")
+                if hum then hum.PlatformStand=true task.delay(0.3,function()pcall(function()hum.PlatformStand=false end)end)end
+            end
         end
     end)
 end)
@@ -1138,7 +1027,7 @@ function OpenMM2Panel()
     MM2Panel.Size=UDim2.new(0,0,0,0)
     MM2Panel.BackgroundTransparency=1
     T:Create(MM2Panel,TweenInfo.new(.6,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{
-        Size=UDim2.new(0,524,0,524),
+        Size=UDim2.new(0,600,0,600),
         BackgroundTransparency=0
     }):Play()
 end
@@ -1178,7 +1067,6 @@ U.InputBegan:Connect(function(input,gameProcessed)
     end
 end)
 
--- Bar drag
 local barDragging=false
 local barStartPos=nil
 local barOrigPos=nil
@@ -1201,7 +1089,6 @@ U.InputChanged:Connect(function(i)
     end
 end)
 
--- Launcher
 MM2Execute.MouseButton1Click:Connect(function()
     T:Create(LauncherMenu,TweenInfo.new(.3),{Size=UDim2.new(0,0,0,0),BackgroundTransparency=1}):Play()
     task.wait(.3)
@@ -1233,4 +1120,4 @@ TopBarText.InputBegan:Connect(function(i)
     end
 end)
 
-Notify("SYPHIX HUB loaded! Neon style!")
+Notify("SYPHIX HUB loaded! ESP updates every frame!")
