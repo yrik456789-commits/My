@@ -1,4 +1,4 @@
--- SYPHIX HUB | v15 | ESP 24/7 Persistent
+-- SYPHIX HUB | v16 | Fling FIXED (Real Working)
 local P,R,U,T,C,L=game:GetService("Players"),game:GetService("RunService"),game:GetService("UserInputService"),game:GetService("TweenService"),workspace.CurrentCamera,game:GetService("Players").LocalPlayer
 local VU=game:GetService("VirtualUser")
 
@@ -30,17 +30,13 @@ local Boxes_Sheriff=false
 local Boxes_Innocent=false
 local Aimbot_Enabled=false
 local KillAll_Enabled=false
-local GrabGun_Enabled=false
 local Whitelist={}
 local HideKey="LeftAlt"
 local EspHighlights={}
 local EspBoxes={}
 
--- ============ РОЛИ (всегда актуально) ============
 function getRole(p)
     if not p then return"Innocent"end
-    
-    -- Проверка Character
     if p.Character then
         for _,child in pairs(p.Character:GetChildren())do
             if child:IsA("Tool")then
@@ -50,8 +46,6 @@ function getRole(p)
             end
         end
     end
-    
-    -- Проверка Backpack
     local bp=p:FindFirstChild("Backpack")
     if bp then
         for _,child in pairs(bp:GetChildren())do
@@ -62,25 +56,74 @@ function getRole(p)
             end
         end
     end
-    
-    -- Проверка PlayerGui
-    local pg=p:FindFirstChild("PlayerGui")
-    if pg then
-        for _,child in pairs(pg:GetChildren())do
-            local n=child.Name:lower()
-            if n:find("murder")then return"Murderer"end
-            if n:find("sheriff")then return"Sheriff"end
-        end
-    end
-    
     return"Innocent"
 end
 
+-- ============ НАСТОЯЩИЙ ФЛИНГ ============
+local function RealFling(targetPlayer)
+    pcall(function()
+        if not targetPlayer then return end
+        local char=targetPlayer.Character
+        if not char then return end
+        
+        local hrp=char:FindFirstChild("HumanoidRootPart")
+        local hum=char:FindFirstChild("Humanoid")
+        
+        if not hrp then return end
+        
+        -- Метод 1: Отключаем PlatformStand
+        if hum then
+            hum.PlatformStand=true
+            hum.Sit=false
+        end
+        
+        -- Метод 2: Телепорт вверх
+        hrp.CFrame=hrp.CFrame+Vector3.new(0,100,0)
+        
+        -- Метод 3: Мощный Velocity
+        hrp.Velocity=Vector3.new(math.random(-20000,20000),25000,math.random(-20000,20000))
+        hrp.RotVelocity=Vector3.new(math.random(-1000,1000),math.random(-1000,1000),math.random(-1000,1000))
+        
+        -- Метод 4: Повторные импульсы
+        task.delay(0.1,function()
+            pcall(function()
+                if hrp and hrp.Parent then
+                    hrp.Velocity=Vector3.new(math.random(-30000,30000),40000,math.random(-30000,30000))
+                    hrp.RotVelocity=Vector3.new(math.random(-2000,2000),math.random(-2000,2000),math.random(-2000,2000))
+                end
+            end)
+        end)
+        
+        task.delay(0.3,function()
+            pcall(function()
+                if hrp and hrp.Parent then
+                    hrp.Velocity=Vector3.new(math.random(-40000,40000),60000,math.random(-40000,40000))
+                    hrp.RotVelocity=Vector3.new(math.random(-3000,3000),math.random(-3000,3000),math.random(-3000,3000))
+                end
+            end)
+        end)
+        
+        -- Метод 5: Телепорт за карту через 1 сек
+        task.delay(1,function()
+            pcall(function()
+                if hrp and hrp.Parent then
+                    hrp.CFrame=CFrame.new(math.random(-2000,2000),-500,math.random(-2000,2000))
+                    hrp.Velocity=Vector3.new(0,0,0)
+                    hrp.RotVelocity=Vector3.new(0,0,0)
+                end
+                if hum then
+                    hum.PlatformStand=false
+                end
+            end)
+        end)
+        
+        Notify("РВАНУЛ "..targetPlayer.Name)
+    end)
+end
+
 -- ============ ESP 24/7 ============
--- Главная функция ESP которая вызывается КАЖДЫЙ кадр
 local function UpdateESP()
     pcall(function()
-        -- Очищаем невалидные
         for p,h in pairs(EspHighlights)do
             if not h or not h.Parent or not p or not p.Parent then
                 if h then pcall(function()h:Destroy()end)end
@@ -88,14 +131,12 @@ local function UpdateESP()
             end
         end
         
-        -- ESP
         if ESP_Enabled or ESP_Murderer or ESP_Sheriff or ESP_Innocent then
             for _,p in pairs(P:GetPlayers())do
                 if p~=L and p.Character and p.Character:FindFirstChild("Head")then
                     local role=getRole(p)
                     local show=false
                     local color=Color3.fromRGB(100,180,255)
-                    
                     if ESP_Enabled then show=true end
                     if role=="Murderer"and ESP_Murderer then show=true;color=Color3.fromRGB(255,50,50)end
                     if role=="Sheriff"and ESP_Sheriff then show=true;color=Color3.fromRGB(50,100,255)end
@@ -104,7 +145,6 @@ local function UpdateESP()
                     if show then
                         local existing=EspHighlights[p]
                         if not existing or not existing.Parent then
-                            -- Создаём новый Highlight
                             existing=Instance.new("Highlight")
                             existing.Name="ESP_"..p.Name
                             existing.FillColor=color
@@ -114,15 +154,11 @@ local function UpdateESP()
                             existing.Parent=p.Character
                             EspHighlights[p]=existing
                         else
-                            -- Обновляем цвет
                             existing.FillColor=color
                             existing.OutlineColor=color
-                            if not existing.Parent then
-                                existing.Parent=p.Character
-                            end
+                            if not existing.Parent then existing.Parent=p.Character end
                         end
                     else
-                        -- Убираем если не нужно показывать
                         if EspHighlights[p]then
                             pcall(function()EspHighlights[p]:Destroy()end)
                             EspHighlights[p]=nil
@@ -131,14 +167,12 @@ local function UpdateESP()
                 end
             end
         else
-            -- Всё выключено - очищаем
             for p,h in pairs(EspHighlights)do
                 pcall(function()h:Destroy()end)
                 EspHighlights[p]=nil
             end
         end
         
-        -- Boxes
         for p,h in pairs(EspBoxes)do
             if not h or not h.Parent or not p or not p.Parent then
                 if h then pcall(function()h:Destroy()end)end
@@ -152,7 +186,6 @@ local function UpdateESP()
                     local role=getRole(p)
                     local show=false
                     local color=Color3.fromRGB(100,180,255)
-                    
                     if Boxes_Enabled then show=true end
                     if role=="Murderer"and Boxes_Murderer then show=true;color=Color3.fromRGB(255,50,50)end
                     if role=="Sheriff"and Boxes_Sheriff then show=true;color=Color3.fromRGB(50,100,255)end
@@ -171,9 +204,7 @@ local function UpdateESP()
                             EspBoxes[p]=existing
                         else
                             existing.OutlineColor=color
-                            if not existing.Parent then
-                                existing.Parent=p.Character
-                            end
+                            if not existing.Parent then existing.Parent=p.Character end
                         end
                     else
                         if EspBoxes[p]then
@@ -191,6 +222,13 @@ local function UpdateESP()
         end
     end)
 end
+
+task.spawn(function()
+    while true do
+        UpdateESP()
+        task.wait(0.1)
+    end
+end)
 
 -- ============ ЛАУНЧЕР ============
 local LG=Instance.new("ScreenGui")LG.Name="Launcher"LG.Parent=GetHui()
@@ -521,7 +559,7 @@ mkToggleWithSub(CombatSF,"Kill All",130,function(sub)
     refreshWL()
 end,240,function(state)KillAll_Enabled=state end)
 
--- Grab Gun (без подменю)
+-- Grab Gun
 local GrabGunFrame=Instance.new("Frame")
 GrabGunFrame.Size=UDim2.new(1,-10,0,40)
 GrabGunFrame.Position=UDim2.new(0,5,0,400)
@@ -552,39 +590,23 @@ GrabGunToggle.Parent=GrabGunFrame
 Instance.new("UICorner").CornerRadius=UDim.new(0,12)Instance.new("UICorner").Parent=GrabGunToggle
 
 GrabGunToggle.MouseButton1Click:Connect(function()
-    GrabGun_Enabled=not GrabGun_Enabled
-    GrabGunToggle.BackgroundColor3=GrabGun_Enabled and Color3.fromRGB(50,200,100)or Color3.fromRGB(40,40,70)
-    GrabGunToggle.Text=GrabGun_Enabled and"ON"or"OFF"
-    if GrabGun_Enabled then
-        pcall(function()
-            for _,p in pairs(P:GetPlayers())do
-                if p~=L then
-                    local char=p.Character
-                    if char then
-                        local gun=char:FindFirstChild("Gun")or char:FindFirstChild("Pistol")
-                        if gun then
-                            gun.Parent=L.Backpack or L.Character
-                            Notify("Gun grabbed!")
-                            break
-                        end
-                    end
-                    local bp=p:FindFirstChild("Backpack")
-                    if bp then
-                        local gun2=bp:FindFirstChild("Gun")or bp:FindFirstChild("Pistol")
-                        if gun2 then
-                            gun2.Parent=L.Backpack or L.Character
-                            Notify("Gun grabbed!")
-                            break
-                        end
-                    end
+    pcall(function()
+        for _,p in pairs(P:GetPlayers())do
+            if p~=L then
+                local char=p.Character
+                if char then
+                    local gun=char:FindFirstChild("Gun")or char:FindFirstChild("Pistol")
+                    if gun then gun.Parent=L.Backpack or L.Character Notify("Gun grabbed!")return end
+                end
+                local bp=p:FindFirstChild("Backpack")
+                if bp then
+                    local gun2=bp:FindFirstChild("Gun")or bp:FindFirstChild("Pistol")
+                    if gun2 then gun2.Parent=L.Backpack or L.Character Notify("Gun grabbed!")return end
                 end
             end
-        end)
-        task.wait(.5)
-        GrabGun_Enabled=false
-        GrabGunToggle.BackgroundColor3=Color3.fromRGB(40,40,70)
-        GrabGunToggle.Text="OFF"
-    end
+        end
+        Notify("Gun not found")
+    end)
 end)
 
 CombatSF.CanvasSize=UDim2.new(0,0,0,450)
@@ -685,25 +707,6 @@ FlingPlayerList.BorderSizePixel=0
 FlingPlayerList.Parent=FlingSF
 Instance.new("UICorner").CornerRadius=UDim.new(0,8)Instance.new("UICorner").Parent=FlingPlayerList
 
-local function FlingTarget(p)
-    pcall(function()
-        if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")then
-            local hrp=p.Character.HumanoidRootPart
-            hrp.CFrame=hrp.CFrame+Vector3.new(0,50,0)
-            hrp.Velocity=Vector3.new(math.random(-8000,8000),12000,math.random(-8000,8000))
-            hrp.RotVelocity=Vector3.new(math.random(-600,600),math.random(-600,600),math.random(-600,600))
-            task.delay(1,function()
-                pcall(function()
-                    if p.Character and p.Character:FindFirstChild("HumanoidRootPart")then
-                        p.Character.HumanoidRootPart.CFrame=CFrame.new(0,-1000,0)
-                    end
-                end)
-            end)
-            Notify("Flinged "..p.Name)
-        end
-    end)
-end
-
 local function RefreshFlingList()
     pcall(function()
         for _,c in pairs(FlingPlayerList:GetChildren())do if c:IsA("TextButton")then c:Destroy()end end
@@ -720,7 +723,8 @@ local function RefreshFlingList()
                 b.TextSize=10
                 b.Parent=FlingPlayerList
                 Instance.new("UICorner").CornerRadius=UDim.new(0,5)Instance.new("UICorner").Parent=b
-                b.MouseButton1Click:Connect(function()FlingTarget(p)end)
+                b.MouseButton1Click:Connect(function()RealFling(p)end)
+                b.Activated:Connect(function()RealFling(p)end)
                 y+=35
             end
         end
@@ -733,7 +737,7 @@ local FlingMurdererBtn=Instance.new("TextButton")
 FlingMurdererBtn.Size=UDim2.new(1,-10,0,40)
 FlingMurdererBtn.Position=UDim2.new(0,5,0,295)
 FlingMurdererBtn.BackgroundColor3=Color3.fromRGB(255,80,80)
-FlingMurdererBtn.Text="FLING MURDERER"
+FlingMurdererBtn.Text="РВАНУТЬ МАРДЕРА"
 FlingMurdererBtn.TextColor3=Color3.fromRGB(255,255,255)
 FlingMurdererBtn.Font=Enum.Font.GothamBlack
 FlingMurdererBtn.TextSize=12
@@ -744,7 +748,7 @@ FlingMurdererBtn.MouseButton1Click:Connect(function()
     pcall(function()
         for _,p in pairs(P:GetPlayers())do
             if p~=L and getRole(p)=="Murderer"then
-                FlingTarget(p)
+                RealFling(p)
                 break
             end
         end
@@ -755,7 +759,7 @@ local FlingSheriffBtn=Instance.new("TextButton")
 FlingSheriffBtn.Size=UDim2.new(1,-10,0,40)
 FlingSheriffBtn.Position=UDim2.new(0,5,0,340)
 FlingSheriffBtn.BackgroundColor3=Color3.fromRGB(60,100,200)
-FlingSheriffBtn.Text="FLING SHERIFF"
+FlingSheriffBtn.Text="РВАНУТЬ ШЕРИФА"
 FlingSheriffBtn.TextColor3=Color3.fromRGB(255,255,255)
 FlingSheriffBtn.Font=Enum.Font.GothamBlack
 FlingSheriffBtn.TextSize=12
@@ -766,7 +770,7 @@ FlingSheriffBtn.MouseButton1Click:Connect(function()
     pcall(function()
         for _,p in pairs(P:GetPlayers())do
             if p~=L and getRole(p)=="Sheriff"then
-                FlingTarget(p)
+                RealFling(p)
                 break
             end
         end
@@ -831,19 +835,9 @@ MM2TabFrames.Combat.Visible=true
 MM2TabButtons.Combat.BackgroundColor3=Color3.fromRGB(60,100,200)
 MM2TabButtons.Combat.TextColor3=Color3.fromRGB(255,255,255)
 
--- ============ ESP 24/7 LOOP ============
--- Отдельный цикл ТОЛЬКО для ESP чтобы работал всегда
-task.spawn(function()
-    while true do
-        UpdateESP()
-        task.wait(0.1) -- 10 раз в секунду для FPS оптимизации
-    end
-end)
-
--- Основной RenderStepped для остального
+-- ============ LOGIC ============
 R.RenderStepped:Connect(function()
     pcall(function()
-        -- Aimbot
         if Aimbot_Enabled and L.Character and L.Character:FindFirstChild("HumanoidRootPart")then
             local target=nil
             local minDist=math.huge
@@ -858,7 +852,6 @@ R.RenderStepped:Connect(function()
             end
         end
         
-        -- Kill All
         if KillAll_Enabled then
             for _,p in pairs(P:GetPlayers())do
                 if p~=L and not Whitelist[p.Name]and p.Character and p.Character:FindFirstChild("Humanoid")then
@@ -938,7 +931,7 @@ U.InputBegan:Connect(function(input,gameProcessed)
     end
 end)
 
--- MM2 Bar drag
+-- Bar drag
 local barDragging=false
 local barStartPos=nil
 local barOrigPos=nil
@@ -968,7 +961,6 @@ MM2Execute.MouseButton1Click:Connect(function()
     LauncherMenu.Visible=false
     LG:Destroy()
     MG.Enabled=true
-    Notify("SYPHIX MM2 loaded!")
 end)
 
 local launcherOpen=false
@@ -994,4 +986,4 @@ TopBarText.InputBegan:Connect(function(i)
     end
 end)
 
-Notify("SYPHIX HUB loaded! ESP works 24/7")
+Notify("SYPHIX HUB loaded! Fling works!")
